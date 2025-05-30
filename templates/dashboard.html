@@ -1,0 +1,374 @@
+{% extends 'base.html' %} {% block title %}Dashboard | Eldiiar Academy{%
+endblock %} {% block content %}
+<div class="max-w-4xl mx-auto">
+  <!-- Profile Section -->
+  <div class="bg-white rounded-lg shadow p-8 mt-8 mb-8">
+    <div class="flex items-center space-x-4 mb-6">
+      <div
+        class="w-16 h-16 rounded-full bg-blue-200 flex items-center justify-center text-2xl font-bold text-blue-700"
+      >
+        {{ profile.avatar or (profile.username[:2]|upper) }}
+      </div>
+      <div>
+        <h2 id="profileUsername" class="text-2xl font-semibold">
+          {{ profile.username }}
+        </h2>
+        <p id="profileHandle" class="text-gray-500">@{{ profile.handle }}</p>
+      </div>
+      <div class="ml-auto">
+        <button
+          id="editProfileBtn"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Edit Profile
+        </button>
+        <button
+          id="deleteProfileBtn"
+          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 ml-2"
+        >
+          Delete Account
+        </button>
+      </div>
+    </div>
+    <p id="profileBio" class="mb-4 text-gray-700">{{ profile.bio }}</p>
+    <div class="mb-4">
+      <span class="font-semibold">Badges:</span>
+      <div class="flex flex-wrap gap-2 mt-2">
+        {% if profile.is_admin %}
+        <span
+          class="bg-yellow-400 text-white text-xs font-bold px-3 py-1 rounded-full"
+          >Admin</span
+        >
+        {% endif %} {% if profile.badges and profile.badges|length > 0 %} {% for
+        badge in profile.badges %}
+        <span
+          class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full"
+          >{{ badge }}</span
+        >
+        {% endfor %} {% elif not profile.is_admin %}
+        <span class="text-gray-400"
+          >No badges yet. Complete lessons to earn badges!</span
+        >
+        {% endif %}
+      </div>
+    </div>
+    <div>
+      <span class="font-semibold">Energy Points:</span>
+      <span class="ml-2 text-blue-600 font-bold"
+        >{{ profile.energy_points }}</span
+      >
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+    <!-- Account Stats -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-xl font-semibold mb-4">Account Stats</h3>
+      <div class="space-y-3">
+        <div class="flex justify-between">
+          <span class="text-gray-600">Account Created:</span>
+          <span class="font-medium">
+            {% if profile.account_created %} {{
+            profile.account_created.strftime('%B %d, %Y') }} {% else %} Not
+            available {% endif %}
+          </span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Last Login:</span>
+          <span class="font-medium">
+            {% if profile.last_logged_in %} {{
+            profile.last_logged_in.strftime('%B %d, %Y') }} {% else %} Not
+            available {% endif %}
+          </span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Total Logins:</span>
+          <span class="font-medium" id="totalLogins">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login Activity -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-xl font-semibold mb-4">Login Activity</h3>
+      <div id="loginActivityChart" class="w-full h-48">
+        <!-- Chart will be rendered here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div
+  id="editProfileModal"
+  class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center"
+>
+  <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+    <h3 class="text-xl font-semibold mb-4">Edit Profile</h3>
+    <form id="editProfileForm" class="space-y-4">
+      <div>
+        <label for="username" class="block text-gray-700">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          value="{{ profile.username }}"
+          class="w-full px-4 py-2 border rounded"
+          required
+        />
+      </div>
+      <div>
+        <label for="handle" class="block text-gray-700">Handle</label>
+        <input
+          type="text"
+          id="handle"
+          name="handle"
+          value="{{ profile.handle }}"
+          class="w-full px-4 py-2 border rounded"
+          required
+        />
+      </div>
+      <div>
+        <label for="bio" class="block text-gray-700"
+          >Bio (max 180 characters)</label
+        >
+        <textarea
+          id="bio"
+          name="bio"
+          maxlength="180"
+          class="w-full px-4 py-2 border rounded"
+        >
+{{ profile.bio }}</textarea
+        >
+      </div>
+      <div class="flex justify-end space-x-2">
+        <button
+          type="button"
+          id="cancelEditBtn"
+          class="px-4 py-2 border rounded hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div
+  id="deleteAccountModal"
+  class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center"
+>
+  <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+    <h3 class="text-xl font-semibold mb-4">Delete Account</h3>
+    <p class="text-gray-700 mb-4">
+      Are you sure you want to delete your account? This action cannot be
+      undone.
+    </p>
+    <div class="flex justify-end space-x-2">
+      <button
+        id="cancelDeleteBtn"
+        class="px-4 py-2 border rounded hover:bg-gray-100"
+      >
+        Cancel
+      </button>
+      <button
+        id="confirmDeleteBtn"
+        class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+      >
+        Delete Account
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Fetch login activity data
+  async function fetchLoginActivity() {
+    try {
+      const response = await fetch(
+        "/api/profile/{{ profile.id }}/login-activity"
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        document.getElementById("totalLogins").textContent = data.totalLogins;
+
+        // Create login activity chart
+        const ctx = document
+          .getElementById("loginActivityChart")
+          .getContext("2d");
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: "Login Activity",
+                data: data.values,
+                backgroundColor: data.values.map((v) =>
+                  v > 0 ? "#10B981" : "#E5E7EB"
+                ),
+                borderWidth: 0,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 1,
+                ticks: {
+                  display: false,
+                },
+              },
+              x: {
+                ticks: {
+                  display: false,
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching login activity:", error);
+      document.getElementById("totalLogins").textContent = "Error loading data";
+    }
+  }
+
+  // Load login activity when page loads
+  document.addEventListener("DOMContentLoaded", fetchLoginActivity);
+
+  // Modal handling
+  const editProfileModal = document.getElementById("editProfileModal");
+  const deleteAccountModal = document.getElementById("deleteAccountModal");
+  const editProfileBtn = document.getElementById("editProfileBtn");
+  const deleteProfileBtn = document.getElementById("deleteProfileBtn");
+  const cancelEditBtn = document.getElementById("cancelEditBtn");
+  const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+  const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+
+  editProfileBtn.addEventListener("click", () => {
+    editProfileModal.classList.remove("hidden");
+    editProfileModal.classList.add("flex");
+  });
+
+  deleteProfileBtn.addEventListener("click", () => {
+    deleteAccountModal.classList.remove("hidden");
+    deleteAccountModal.classList.add("flex");
+  });
+
+  cancelEditBtn.addEventListener("click", () => {
+    editProfileModal.classList.add("hidden");
+    editProfileModal.classList.remove("flex");
+  });
+
+  cancelDeleteBtn.addEventListener("click", () => {
+    deleteAccountModal.classList.add("hidden");
+    deleteAccountModal.classList.remove("flex");
+  });
+
+  // Handle profile update
+  document
+    .getElementById("editProfileForm")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const handle = document.getElementById("handle").value.trim();
+      const bio = document.getElementById("bio").value.trim();
+
+      try {
+        const response = await fetch("/api/profile/{{ profile.id }}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, handle, bio }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Update the profile display
+          document.getElementById("profileUsername").textContent = username;
+          document.getElementById("profileHandle").textContent = `@${handle}`;
+          document.getElementById("profileBio").textContent =
+            bio || "No bio yet";
+
+          // Close the modal
+          document.getElementById("editProfileModal").classList.add("hidden");
+          document.getElementById("editProfileModal").classList.remove("flex");
+
+          // Show success message
+          const successMessage = document.createElement("div");
+          successMessage.className =
+            "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg";
+          successMessage.textContent = "Profile updated successfully";
+          document.body.appendChild(successMessage);
+
+          // Remove success message after 3 seconds
+          setTimeout(() => {
+            successMessage.remove();
+          }, 3000);
+        } else {
+          throw new Error(data.error || "Failed to update profile");
+        }
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        // Show error message
+        const errorMessage = document.createElement("div");
+        errorMessage.className =
+          "fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded shadow-lg";
+        errorMessage.textContent = error.message;
+        document.body.appendChild(errorMessage);
+
+        // Remove error message after 3 seconds
+        setTimeout(() => {
+          errorMessage.remove();
+        }, 3000);
+      }
+    });
+
+  // Handle account deletion
+  confirmDeleteBtn.addEventListener("click", async () => {
+    if (
+      confirm(
+        "Are you absolutely sure you want to delete your account? This action cannot be undone."
+      )
+    ) {
+      try {
+        const response = await fetch("/api/profile/{{ profile.id }}", {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          window.location.href = "/";
+        } else {
+          const data = await response.json();
+          alert(data.error || "Failed to delete account");
+        }
+      } catch (error) {
+        console.error("Error deleting account:", error);
+        alert("An error occurred while deleting account");
+      }
+    }
+  });
+</script>
+{% endblock %}

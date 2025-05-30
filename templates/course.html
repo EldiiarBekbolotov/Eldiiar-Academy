@@ -1,0 +1,292 @@
+{% extends "base.html" %} {% block title %}{{ course.title }} | Eldiiar
+Academy{% endblock %} {% block content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold mb-2">{{ course.title }}</h1>
+    <p class="text-gray-600">{{ course.description }}</p>
+    <div class="mt-4 flex items-center gap-4">
+      <span class="text-sm text-gray-500">{{ course.units_count }} Units</span>
+      <span class="text-sm text-gray-500"
+        >{{ course.lessons_count }} Lessons</span
+      >
+    </div>
+  </div>
+
+  {% if user and user.is_admin %}
+  <div class="mb-8">
+    <button
+      onclick="showModal('createUnitModal')"
+      class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+    >
+      Add New Unit
+    </button>
+  </div>
+  {% endif %}
+
+  <div class="space-y-8">
+    {% for unit in units %}
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-2xl font-semibold mb-4">{{ unit.title }}</h2>
+
+      {% if user and user.is_admin %}
+      <div class="mb-4">
+        <button
+          onclick="showModal('createLessonModal', '{{ unit.id }}')"
+          class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        >
+          Add Lesson to Unit
+        </button>
+      </div>
+      {% endif %}
+
+      <div class="space-y-4">
+        {% for lesson in unit.lessons %}
+        <div
+          class="border rounded-lg p-4 {% if lesson.completed %}bg-green-50{% endif %}"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-medium">{{ lesson.title }}</h3>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-sm text-gray-500"
+                  >{{ lesson.lesson_type|title }}</span
+                >
+                {% if lesson.completed %}
+                <span class="text-sm text-green-600">✓ Completed</span>
+                {% endif %}
+              </div>
+            </div>
+            <a
+              href="/lesson/{{ lesson.id }}"
+              class="text-blue-500 hover:text-blue-600"
+              >View Lesson</a
+            >
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Create Unit Modal -->
+  {% if user and user.is_admin %}
+  <div
+    id="createUnitModal"
+    class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center"
+  >
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <h2 class="text-2xl font-bold mb-4">Create New Unit</h2>
+      <form id="createUnitForm" onsubmit="createUnit(event)">
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2" for="unitTitle"
+            >Unit Title</label
+          >
+          <input
+            type="text"
+            id="unitTitle"
+            name="title"
+            required
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div class="flex justify-end gap-4">
+          <button
+            type="button"
+            onclick="hideModal('createUnitModal')"
+            class="px-4 py-2 text-gray-600 hover:text-gray-800"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Create Unit
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create Lesson Modal -->
+  <div
+    id="createLessonModal"
+    class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center"
+  >
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <h2 class="text-2xl font-bold mb-4">Create New Lesson</h2>
+      <form id="createLessonForm" onsubmit="createLesson(event)">
+        <input type="hidden" id="lessonUnitId" name="unit_id" />
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2" for="lessonTitle"
+            >Lesson Title</label
+          >
+          <input
+            type="text"
+            id="lessonTitle"
+            name="title"
+            required
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2" for="lessonType"
+            >Lesson Type</label
+          >
+          <select
+            id="lessonType"
+            name="lesson_type"
+            required
+            onchange="toggleLessonFields()"
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="text">Text Lesson</option>
+            <option value="video">Video Lesson</option>
+            <option value="quiz">Quiz Lesson</option>
+          </select>
+        </div>
+        <div id="textContent" class="mb-4">
+          <label class="block text-gray-700 mb-2" for="lessonContent"
+            >Content</label
+          >
+          <textarea
+            id="lessonContent"
+            name="content"
+            rows="4"
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          ></textarea>
+        </div>
+        <div id="videoContent" class="mb-4 hidden">
+          <label class="block text-gray-700 mb-2" for="videoUrl"
+            >YouTube Video URL</label
+          >
+          <input
+            type="url"
+            id="videoUrl"
+            name="video_url"
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="https://www.youtube.com/watch?v=..."
+          />
+        </div>
+        <div id="quizContent" class="mb-4 hidden">
+          <label class="block text-gray-700 mb-2" for="quizData"
+            >Quiz Data (JSON)</label
+          >
+          <textarea
+            id="quizData"
+            name="quiz_data"
+            rows="4"
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder='{"questions": [{"question": "Question 1", "options": ["A", "B", "C"], "correct": 0}]}'
+          ></textarea>
+        </div>
+        <div class="flex justify-end gap-4">
+          <button
+            type="button"
+            onclick="hideModal('createLessonModal')"
+            class="px-4 py-2 text-gray-600 hover:text-gray-800"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Create Lesson
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  function showModal(modalId, unitId = null) {
+    document.getElementById(modalId).classList.remove("hidden");
+    if (unitId) {
+      document.getElementById("lessonUnitId").value = unitId;
+    }
+  }
+
+  function hideModal(modalId) {
+    document.getElementById(modalId).classList.add("hidden");
+  }
+
+  function toggleLessonFields() {
+    const lessonType = document.getElementById("lessonType").value;
+    document
+      .getElementById("textContent")
+      .classList.toggle("hidden", lessonType !== "text");
+    document
+      .getElementById("videoContent")
+      .classList.toggle("hidden", lessonType !== "video");
+    document
+      .getElementById("quizContent")
+      .classList.toggle("hidden", lessonType !== "quiz");
+  }
+
+  async function createUnit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      const response = await fetch("/api/courses/{{ course.id }}/units", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create unit");
+      }
+
+      window.location.reload();
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to create unit. Please try again.");
+    }
+  }
+
+  async function createLesson(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    // Parse quiz data if it's a quiz lesson
+    if (data.lesson_type === "quiz") {
+      try {
+        data.quiz_data = JSON.parse(data.quiz_data);
+      } catch (e) {
+        alert("Invalid quiz data format. Please check your JSON.");
+        return;
+      }
+    }
+
+    try {
+      const response = await fetch(`/api/units/${data.unit_id}/lessons`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create lesson");
+      }
+
+      window.location.reload();
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to create lesson. Please try again.");
+    }
+  }
+</script>
+{% endblock %}

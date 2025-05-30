@@ -1,0 +1,579 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lesson.title }} | {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Breadcrumb -->
+    <nav class="text-sm mb-4 overflow-x-auto">
+        <ol class="list-none p-0 inline-flex whitespace-nowrap">
+            <li class="flex items-center">
+                <a href="/browse_courses" class="text-blue-600 hover:text-blue-800">Courses</a>
+                <svg class="fill-current w-3 h-3 mx-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                    <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/>
+                </svg>
+            </li>
+            <li class="flex items-center">
+                <a href="/course/{{ course.id }}" class="text-blue-600 hover:text-blue-800">{{ course.title }}</a>
+                <svg class="fill-current w-3 h-3 mx-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                    <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/>
+                </svg>
+            </li>
+            <li class="flex items-center">
+                <span class="text-gray-500">{{ unit.title }}</span>
+                <svg class="fill-current w-3 h-3 mx-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                    <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/>
+                </svg>
+            </li>
+            <li><span class="text-gray-500">{{ lesson.title }}</span></li>
+        </ol>
+    </nav>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Navigation Rail -->
+        <div class="w-full lg:w-64 flex-shrink-0">
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h3 class="font-semibold text-lg mb-4">{{ course.title }}</h3>
+                <div class="space-y-4">
+                    {% for u in units %}
+                    <div>
+                        <h4 class="font-medium text-gray-700 mb-2">{{ u.title }}</h4>
+                        <ul class="space-y-1">
+                            {% for l in lessons if l.unit_id == u.id %}
+                            <li>
+                                <a href="/lesson/{{ l.id }}" 
+                                   class="block px-3 py-2 rounded {% if l.id == lesson.id %}bg-blue-100 text-blue-700{% else %}hover:bg-gray-100{% endif %}">
+                                    {{ l.title }}
+                                    {% if l.completed %}
+                                    <span class="ml-2 text-green-500">✓</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-grow">
+            <!-- Lesson Header -->
+            <div class="bg-white rounded-lg shadow-md p-4 lg:p-6 mb-6">
+                <div class="flex flex-col lg:flex-row justify-between items-start gap-4">
+                    <div>
+                        <h1 class="text-2xl lg:text-3xl font-bold mb-2">{{ lesson.title }}</h1>
+                        <div class="text-sm text-gray-600 mb-4">
+                            <p>Created by {{ lesson.creator_username }} on {{ lesson.created_at.strftime('%B %d, %Y') }}</p>
+                            {% if lesson.updated_at != lesson.created_at %}
+                            <p>Last updated by {{ lesson.updater_username }} on {{ lesson.updated_at.strftime('%B %d, %Y') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if user and user.is_admin %}
+                    <div class="flex space-x-2">
+                        <button onclick="showEditModal()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                            Edit Lesson
+                        </button>
+                        <button onclick="confirmDelete()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                            Delete Lesson
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Lesson Content -->
+            <div class="bg-white rounded-lg shadow p-4 lg:p-6 mb-8">
+                <div class="prose max-w-none">
+                    {% if lesson.lesson_type == 'text' %}
+                        {{ lesson.content|safe }}
+                    {% elif lesson.lesson_type == 'video' %}
+                        <div class="aspect-w-16 aspect-h-9 mb-4">
+                            <iframe
+                                src="https://www.youtube.com/embed/{{ lesson.video_url|youtube_id }}"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                                class="w-full h-full rounded-lg"
+                            ></iframe>
+                        </div>
+                    {% elif lesson.lesson_type == 'quiz' %}
+                        <div id="quiz-container" class="space-y-4">
+                            <!-- Quiz will be loaded here -->
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Mark as Complete Button -->
+                {% if user and not lesson.completed %}
+                <div class="mt-6 flex justify-end">
+                    <button
+                        onclick="markLessonComplete()"
+                        class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>Mark as Complete</span>
+                    </button>
+                </div>
+                {% elif lesson.completed %}
+                <div class="mt-6 flex justify-end">
+                    <div class="bg-green-100 text-green-800 px-6 py-2 rounded-lg flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>Completed</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Comments Section -->
+            <div class="bg-white rounded-lg shadow p-4 lg:p-6">
+                <h3 class="text-xl font-semibold mb-4">Discussion</h3>
+                
+                {% if user %}
+                <!-- Comment Form -->
+                <form id="commentForm" class="mb-6">
+                    <div class="mb-4">
+                        <textarea
+                            id="commentContent"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            rows="3"
+                            placeholder="Add to the discussion..."
+                            required
+                        ></textarea>
+                    </div>
+  <button
+                        type="submit"
+                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                    >
+                        Post Comment
+                    </button>
+                </form>
+                {% else %}
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <p class="text-gray-600">
+                        Please <a href="{{ url_for('login') }}" class="text-blue-600 hover:underline">log in</a> to join the discussion.
+                    </p>
+                </div>
+                {% endif %}
+
+                <!-- Comments List -->
+                <div id="commentsList" class="space-y-6">
+                    {% for comment in comments %}
+                    <div class="comment border-b pb-4" data-comment-id="{{ comment.id }}">
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-lg font-bold text-blue-700">
+                                    {{ comment.username[:2]|upper }}
+                                </div>
+                            </div>
+                            <div class="flex-grow">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="font-semibold">{{ comment.username }}</span>
+                                    <span class="text-gray-500">@{{ comment.handle }}</span>
+                                    <span class="text-gray-400 text-sm">{{ comment.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                                </div>
+                                <p class="mt-1 text-gray-700">{{ comment.content }}</p>
+                                
+                                <!-- Reply Form -->
+                                {% if user %}
+                                <div class="mt-2">
+                                    <button type="button" class="text-blue-600 hover:text-blue-800 text-sm reply-btn">
+                                        Reply
+                                    </button>
+                                    <form class="reply-form hidden mt-2" data-comment-id="{{ comment.id }}">
+                                        <textarea
+                                            class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            rows="2"
+                                            placeholder="Write a reply..."
+                                            required
+                                        ></textarea>
+                                        <div class="mt-2 flex justify-end space-x-2">
+                                            <button type="button" class="text-sm text-gray-600 hover:text-gray-800 cancel-reply">
+                                                Cancel
+                                            </button>
+                                            <button type="submit" class="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                                                Post Reply
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                {% endif %}
+
+                                <!-- Replies -->
+                                {% if comment.replies %}
+                                <div class="replies mt-4 space-y-4">
+                                    {% for reply in comment.replies %}
+                                    <div class="reply pl-4 lg:pl-8 border-l-2 border-gray-200">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <span class="font-semibold">{{ reply.username }}</span>
+                                            <span class="text-gray-500">@{{ reply.handle }}</span>
+                                            <span class="text-gray-400 text-sm">{{ reply.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                                        </div>
+                                        <p class="mt-1 text-gray-700">{{ reply.content }}</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Lesson Modal -->
+{% if user and user.is_admin %}
+<div id="edit-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Edit Lesson</h3>
+            <form id="edit-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Title</label>
+                    <input type="text" id="edit-title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ lesson.title }}" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Lesson Type</label>
+                    <select id="edit-lesson-type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                        <option value="text" {% if lesson.lesson_type == 'text' %}selected{% endif %}>Text</option>
+                        <option value="video" {% if lesson.lesson_type == 'video' %}selected{% endif %}>Video</option>
+                        <option value="quiz" {% if lesson.lesson_type == 'quiz' %}selected{% endif %}>Quiz</option>
+                    </select>
+                </div>
+                <div id="edit-content-container">
+                    <label class="block text-sm font-medium text-gray-700">Content</label>
+                    <textarea id="edit-content" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" rows="4">{{ lesson.content }}</textarea>
+                </div>
+                <div id="edit-video-container" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700">Video URL</label>
+                    <input type="url" id="edit-video-url" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ lesson.video_url }}">
+                </div>
+                <div id="edit-quiz-container" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700">Quiz Data (JSON)</label>
+                    <textarea id="edit-quiz-data" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" rows="4">{{ lesson.quiz_data|tojson(indent=2) }}</textarea>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="hideEditModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+                        Cancel
+                    </button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Save Changes
+  </button>
+                </div>
+            </form>
+        </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+let lessonId = "{{ lesson.id }}";
+let lessonType = "{{ lesson.lesson_type }}";
+
+// Show/hide edit modal
+function showEditModal() {
+    document.getElementById('edit-modal').classList.remove('hidden');
+}
+
+function hideEditModal() {
+    document.getElementById('edit-modal').classList.add('hidden');
+}
+
+// Handle lesson type change in edit form
+document.getElementById('edit-lesson-type').addEventListener('change', function(e) {
+    const type = e.target.value;
+    document.getElementById('edit-content-container').classList.toggle('hidden', type === 'video');
+    document.getElementById('edit-video-container').classList.toggle('hidden', type !== 'video');
+    document.getElementById('edit-quiz-container').classList.toggle('hidden', type !== 'quiz');
+});
+
+// Handle edit form submission
+document.getElementById('edit-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        title: document.getElementById('edit-title').value,
+        lesson_type: document.getElementById('edit-lesson-type').value,
+        content: document.getElementById('edit-content').value
+    };
+
+    if (formData.lesson_type === 'video') {
+        formData.video_url = document.getElementById('edit-video-url').value;
+    } else if (formData.lesson_type === 'quiz') {
+        try {
+            formData.quiz_data = JSON.parse(document.getElementById('edit-quiz-data').value);
+        } catch (error) {
+            alert('Invalid quiz data format. Please check your JSON.');
+            return;
+        }
+    }
+
+    try {
+        const response = await fetch(`/api/lessons/${lessonId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Failed to update lesson');
+        }
+
+        window.location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+        alert(error.message || 'Failed to update lesson');
+    }
+});
+
+// Confirm and handle lesson deletion
+function confirmDelete() {
+    if (confirm('Are you sure you want to delete this lesson? This action cannot be undone.')) {
+        deleteLesson();
+    }
+}
+
+async function deleteLesson() {
+    try {
+        const response = await fetch(`/api/lessons/${lessonId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            window.location.href = '/browse_courses';
+        } else {
+            const data = await response.json();
+            alert(data.error || 'Failed to delete lesson');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to delete lesson');
+    }
+}
+
+// Load and display quiz if lesson type is quiz
+async function loadQuiz() {
+    if (lessonType === 'quiz') {
+        try {
+            const response = await fetch(`/api/lesson/${lessonId}`);
+            const lesson = await response.json();
+            
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = '';
+
+            lesson.quiz_data.questions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'border rounded-lg p-4';
+                questionDiv.innerHTML = `
+                    <h3 class="font-medium mb-2">${index + 1}. ${question.question}</h3>
+                    <div class="space-y-2">
+                        ${question.options.map((option, optIndex) => `
+                            <label class="flex items-center">
+                                <input type="radio" name="q${index}" value="${option}" class="mr-2">
+                                ${option}
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                quizContainer.appendChild(questionDiv);
+            });
+
+            const submitButton = document.createElement('button');
+            submitButton.className = 'mt-4 bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600';
+            submitButton.textContent = 'Submit Quiz';
+            submitButton.onclick = submitQuiz;
+            quizContainer.appendChild(submitButton);
+        } catch (error) {
+            console.error('Error loading quiz:', error);
+        }
+    }
+}
+
+// Submit quiz answers
+async function submitQuiz() {
+    const answers = [];
+    const questions = document.querySelectorAll('[id^="q"]');
+    
+    questions.forEach((question, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if (selected) {
+            answers.push(selected.value);
+        } else {
+            answers.push(null);
+        }
+    });
+
+    if (answers.includes(null)) {
+        alert('Please answer all questions');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/lesson/${lessonId}/quiz`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ answers })
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(`Your score: ${result.score}%\n${result.passed ? 'Congratulations! You passed!' : 'Try again!'}`);
+            if (result.passed) {
+                window.location.reload();
+            }
+        } else {
+            alert(result.error || 'Failed to submit quiz');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to submit quiz');
+    }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    if (lessonType === 'quiz') {
+        loadQuiz();
+    }
+
+    const commentForm = document.getElementById('commentForm');
+    const commentsList = document.getElementById('commentsList');
+
+    // Handle main comment submission
+    if (commentForm) {
+        commentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const content = document.getElementById('commentContent').value.trim();
+            
+            try {
+                const response = await fetch(`/api/comments/${lessonId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ content })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to post comment');
+                }
+
+                location.reload();
+            } catch (error) {
+                console.error('Error posting comment:', error);
+                alert(error.message || 'Failed to post comment. Please try again.');
+            }
+        });
+    }
+
+    // Handle reply buttons
+    document.querySelectorAll('.reply-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            // Hide all other reply forms first
+            document.querySelectorAll('.reply-form').forEach(form => {
+                form.classList.add('hidden');
+            });
+            // Show this reply form
+            const replyForm = button.nextElementSibling;
+            replyForm.classList.remove('hidden');
+            // Focus the textarea
+            replyForm.querySelector('textarea').focus();
+        });
+    });
+
+    // Handle cancel reply buttons
+    document.querySelectorAll('.cancel-reply').forEach(button => {
+        button.addEventListener('click', () => {
+            const replyForm = button.closest('.reply-form');
+            replyForm.classList.add('hidden');
+            // Clear the textarea
+            replyForm.querySelector('textarea').value = '';
+        });
+    });
+
+    // Handle reply submissions
+    document.querySelectorAll('.reply-form').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const commentId = form.dataset.commentId;
+            const content = form.querySelector('textarea').value.trim();
+            
+            if (!content) {
+                alert('Please enter a reply');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/comments/${lessonId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        content,
+                        parent_id: commentId
+                    })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to post reply');
+                }
+
+                // Clear the form and hide it
+                form.querySelector('textarea').value = '';
+                form.classList.add('hidden');
+                
+                // Reload the page to show the new reply
+                location.reload();
+            } catch (error) {
+                console.error('Error posting reply:', error);
+                alert(error.message || 'Failed to post reply. Please try again.');
+            }
+        });
+    });
+});
+
+// Mark lesson as complete
+async function markLessonComplete() {
+    try {
+        const response = await fetch(`/api/lesson/${lessonId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Failed to mark lesson as complete');
+        }
+
+        location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+        alert(error.message || 'Failed to mark lesson as complete');
+    }
+}
+</script>
+{% endblock %}
