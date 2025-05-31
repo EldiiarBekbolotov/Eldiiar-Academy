@@ -1,0 +1,19 @@
+
+ body {
+        font-family: "Poppins", sans-serif;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Lora", sans-serif;
+      }
+
+      .material-symbols-outlined {
+        vertical-align: middle;
+        font-size: 20px;
+      }
+
+      
