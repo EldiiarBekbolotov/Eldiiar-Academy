@@ -93,7 +93,8 @@ CREATE TABLE login_sessions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     login_date DATE NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    UNIQUE(user_id, login_date)
 );
 
 -- RLS for login_sessions

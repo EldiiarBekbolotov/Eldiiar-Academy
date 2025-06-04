@@ -362,7 +362,9 @@ def ensure_schema():
             CREATE TABLE IF NOT EXISTS login_sessions (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-                login_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                login_date DATE NOT NULL,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(user_id, login_date)
             );
         """,
     }
@@ -702,6 +704,12 @@ ensure_schema()
 update_admin_status()
 
 
+# Add context processor for datetime
+@app.context_processor
+def inject_now():
+    return {"now": datetime.now(), "datetime": datetime}
+
+
 # --- Page Routes ---
 @app.route("/")
 def index():
@@ -829,7 +837,10 @@ def course(course_id):
 @app.route("/lesson/<lesson_id>")
 def lesson(lesson_id):
     user_id = session.get("user_id")
+    print(f"Session user_id: {user_id}")  # Debug log
+
     if not user_id:
+        print("No user_id in session, redirecting to login")  # Debug log
         return redirect(url_for("login"))
 
     try:
@@ -927,10 +938,12 @@ def lesson(lesson_id):
         for comment in comments_result:
             comment_data = {
                 "id": comment["id"],
+                "user_id": comment["user_id"],
                 "content": comment["content"],
                 "created_at": comment["created_at"],
                 "username": comment["username"],
                 "handle": comment["handle"],
+                "parent_id": comment["parent_id"],  # Add parent_id to comment data
                 "replies": [],
             }
 
@@ -947,12 +960,26 @@ def lesson(lesson_id):
                     break
 
         # Get user profile for admin check
-        cur.execute("SELECT is_admin FROM profiles WHERE id = %s", (user_id,))
+        cur.execute("SELECT * FROM profiles WHERE id = %s", (user_id,))
         user_profile = cur.fetchone()
-        is_admin = user_profile["is_admin"] if user_profile else False
+
+        if not user_profile:
+            print(f"No profile found for user {user_id}")  # Debug log
+            conn.close()
+            return redirect(url_for("signup"))
+
+        # Create user object with all necessary fields
+        user = {
+            "id": user_id,
+            "is_admin": user_profile["is_admin"],
+            "can_comment": True,  # All logged-in users can comment
+            "username": user_profile["username"],
+            "handle": user_profile["handle"],
+        }
+
+        print(f"User object created: {user}")  # Debug log
 
         conn.close()
-
         return render_template(
             "lesson.html",
             lesson=lesson,
@@ -962,7 +989,7 @@ def lesson(lesson_id):
             lessons=lessons,
             completed=bool(completion),
             comments=comments,
-            user={"id": user_id, "is_admin": is_admin},
+            user=user,  # Pass the complete user object
         )
     except Exception as e:
         print(f"Error in lesson route: {str(e)}")
@@ -1073,6 +1100,36 @@ def discussion(lesson_id):
     return render_template("discussion.html", lesson_id=lesson_id)
 
 
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+
+@app.route("/blog")
+def blog():
+    return render_template("blog.html")
+
+
+@app.route("/help")
+def help_center():
+    return render_template("help_center.html")
+
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html", now=datetime.now())
+
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html", now=datetime.now())
+
+
+@app.route("/guidelines")
+def guidelines():
+    return render_template("guidelines.html", now=datetime.now())
+
+
 # --- API Endpoints ---
 @app.route("/api/auth/signup", methods=["POST"])
 def api_signup():
@@ -1130,33 +1187,46 @@ def api_login():
             {"email": email, "password": password}
         )
         user = auth_response.user
-        print("User logged in:", user)
+        print(f"User logged in: {user.id}")  # Debug log
 
-        # Update last_logged_in in profiles table
-        supabase.table("profiles").update({"last_logged_in": "now()"}).eq(
-            "id", user.id
-        ).execute()
-
-        # Record login session with UPSERT
+        # Update last_logged_in and record login session using direct SQL
         conn = get_db_connection()
         cur = conn.cursor()
+
+        # Get user profile
+        cur.execute("SELECT * FROM profiles WHERE id = %s", (user.id,))
+        profile = cur.fetchone()
+
+        if not profile:
+            conn.close()
+            return jsonify({"error": "Profile not found. Please sign up first."}), 400
+
+        # Update last login time
         cur.execute(
             """
+            UPDATE profiles SET last_logged_in = CURRENT_TIMESTAMP WHERE id = %s;
             INSERT INTO login_sessions (user_id, login_date)
             VALUES (%s, CURRENT_DATE)
-            ON CONFLICT (user_id, login_date) 
-            DO UPDATE SET login_date = CURRENT_DATE
+            ON CONFLICT (user_id, login_date) DO UPDATE SET login_date = CURRENT_DATE;
             """,
-            (user.id,),
+            (user.id, user.id),
         )
         conn.commit()
         conn.close()
 
         # Set session
+        session.clear()  # Clear any existing session
         session["user_id"] = user.id
+        print(f"Session set: {session.get('user_id')}")  # Debug log
 
         # Extract relevant user data
-        user_data = {"id": user.id, "email": user.email}
+        user_data = {
+            "id": user.id,
+            "email": user.email,
+            "username": profile["username"],
+            "handle": profile["handle"],
+            "is_admin": profile["is_admin"],
+        }
 
         return jsonify({"message": "Login successful", "user": user_data}), 200
     except Exception as e:
@@ -1197,7 +1267,7 @@ def api_login_activity(user_id):
         # Get total logins
         cur.execute(
             """
-            SELECT COUNT(DISTINCT login_date) as total 
+            SELECT COUNT(*) as total 
             FROM login_sessions 
             WHERE user_id = %s
         """,
@@ -1764,7 +1834,7 @@ def api_lesson(lesson_id):
             return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/comments/<lesson_id>", methods=["GET", "POST"])
+@app.route("/api/comments/<lesson_id>", methods=["GET", "POST", "DELETE"])
 def api_comments(lesson_id):
     if request.method == "GET":
         try:
@@ -1792,10 +1862,12 @@ def api_comments(lesson_id):
             for comment in comments_result:
                 comment_data = {
                     "id": comment["id"],
+                    "user_id": comment["user_id"],
                     "content": comment["content"],
                     "created_at": comment["created_at"],
                     "username": comment["username"],
                     "handle": comment["handle"],
+                    "parent_id": comment["parent_id"],  # Add parent_id to comment data
                     "replies": [],
                 }
 
@@ -1817,12 +1889,19 @@ def api_comments(lesson_id):
             return jsonify({"error": str(e)}), 500
 
     elif request.method == "POST":
-        if not session.get("user_id"):
+        user_id = session.get("user_id")
+        print(f"POST comment - User ID: {user_id}")  # Debug log
+
+        if not user_id:
             return jsonify({"error": "Unauthorized"}), 401
 
         try:
             data = request.get_json()
+            if not data:
+                return jsonify({"error": "No data provided"}), 400
+
             content = data.get("content")
+            parent_id = data.get("parent_id")  # Optional parent_id for replies
 
             if not content:
                 return jsonify({"error": "Content is required"}), 400
@@ -1830,18 +1909,37 @@ def api_comments(lesson_id):
             conn = get_db_connection()
             cur = conn.cursor()
 
+            # Verify user exists
+            cur.execute("SELECT id FROM profiles WHERE id = %s", (user_id,))
+            if not cur.fetchone():
+                conn.close()
+                return jsonify({"error": "User profile not found"}), 404
+
             # Insert the comment
             cur.execute(
                 """
-                INSERT INTO comments (lesson_id, user_id, content)
-                VALUES (%s, %s, %s)
+                INSERT INTO comments (lesson_id, user_id, content, parent_id)
+                VALUES (%s, %s, %s, %s)
                 RETURNING id, created_at
                 """,
-                (lesson_id, session["user_id"], content),
+                (lesson_id, user_id, content, parent_id),
             )
 
             new_comment = cur.fetchone()
+            if not new_comment:
+                conn.close()
+                return jsonify({"error": "Failed to create comment"}), 500
+
             conn.commit()
+            conn.close()
+
+            # Get user info for the response
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT username, handle FROM profiles WHERE id = %s", (user_id,)
+            )
+            user_info = cur.fetchone()
             conn.close()
 
             return jsonify(
@@ -1849,99 +1947,54 @@ def api_comments(lesson_id):
                     "id": new_comment["id"],
                     "content": content,
                     "created_at": new_comment["created_at"],
+                    "user_id": user_id,
+                    "username": user_info["username"],
+                    "handle": user_info["handle"],
+                    "parent_id": parent_id,  # Add parent_id to the response
                 }
             ), 201
+
         except Exception as e:
             print(f"Error posting comment: {str(e)}")
-            conn.close()
-            print(f"Error deleting lesson: {str(e)}")
+            if "conn" in locals():
+                conn.close()
             return jsonify({"error": str(e)}), 500
 
-    else:  # PUT
+    elif request.method == "DELETE":
+        user_id = session.get("user_id")
+        print(f"DELETE comment - User ID: {user_id}")  # Debug log
+
+        if not user_id:
+            return jsonify({"error": "Unauthorized"}), 401
+
         try:
-            data = request.json
-            if not data or not data.get("title") or not data.get("lesson_type"):
-                conn.close()
-                return jsonify({"error": "Title and lesson type are required"}), 400
+            comment_id = request.args.get("comment_id")
+            if not comment_id:
+                return jsonify({"error": "Comment ID is required"}), 400
 
-            # Validate lesson type
-            if data["lesson_type"] not in ["text", "video", "quiz"]:
-                conn.close()
-                return jsonify(
-                    {"error": "Invalid lesson type. Must be 'text', 'video', or 'quiz'"}
-                ), 400
+            conn = get_db_connection()
+            cur = conn.cursor()
 
-            # Validate video URL if lesson type is video
-            if data["lesson_type"] == "video" and not data.get("video_url"):
-                conn.close()
-                return jsonify(
-                    {"error": "Video URL is required for video lessons"}
-                ), 400
-
-            # Validate quiz data if lesson type is quiz
-            if data["lesson_type"] == "quiz":
-                if not data.get("quiz_data"):
-                    conn.close()
-                    return jsonify(
-                        {"error": "Quiz data is required for quiz lessons"}
-                    ), 400
-                try:
-                    if isinstance(data["quiz_data"], str):
-                        data["quiz_data"] = json.loads(data["quiz_data"])
-                    if (
-                        not isinstance(data["quiz_data"], dict)
-                        or "questions" not in data["quiz_data"]
-                    ):
-                        conn.close()
-                        return jsonify(
-                            {
-                                "error": "Invalid quiz data format. Must include 'questions' array"
-                            }
-                        ), 400
-                except json.JSONDecodeError:
-                    conn.close()
-                    return jsonify(
-                        {"error": "Invalid quiz data format. Please check your JSON"}
-                    ), 400
-
-            # Convert quiz_data to JSON string if it exists
-            quiz_data = None
-            if data.get("quiz_data"):
-                quiz_data = json.dumps(data["quiz_data"])
-
+            # Delete the comment (RLS will ensure user can only delete their own comments)
             cur.execute(
                 """
-                UPDATE lessons 
-                SET title = %s,
-                    content = %s,
-                    lesson_type = %s,
-                    video_url = %s,
-                    quiz_data = %s,
-                    updated_at = CURRENT_TIMESTAMP,
-                    updated_by = %s
-                WHERE id = %s
-                RETURNING *
+                DELETE FROM comments 
+                WHERE id = %s AND lesson_id = %s AND user_id = %s
+                RETURNING id
                 """,
-                (
-                    data["title"],
-                    data.get("content", ""),
-                    data["lesson_type"],
-                    data.get("video_url", ""),
-                    quiz_data,
-                    session["user_id"],
-                    lesson_id,
-                ),
+                (comment_id, lesson_id, user_id),
             )
-            lesson = cur.fetchone()
-            if not lesson:
-                conn.close()
-                return jsonify({"error": "Lesson not found"}), 404
+            deleted = cur.fetchone()
             conn.commit()
             conn.close()
-            return jsonify(dict(lesson))
+
+            if not deleted:
+                return jsonify({"error": "Comment not found or unauthorized"}), 404
+
+            return jsonify({"message": "Comment deleted successfully"}), 200
         except Exception as e:
+            print(f"Error deleting comment: {str(e)}")
             conn.close()
-            print(f"Error updating lesson: {str(e)}")
             return jsonify({"error": str(e)}), 500
 
 

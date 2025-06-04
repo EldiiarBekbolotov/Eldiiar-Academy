@@ -1,0 +1,76 @@
+{% extends "base.html" %} {% block title %}Help Center - Eldiiar Academy{%
+endblock %} {% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-gray-900 mb-6">Help Center</h1>
+
+  <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <span class="material-symbols-outlined text-blue-400">info</span>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-blue-700">
+          Our help center is currently being developed. In the meantime, you can
+          find answers to common questions below.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Getting Started</h2>
+      <div class="space-y-4">
+        <div>
+          <h3 class="font-medium text-gray-900">How do I create an account?</h3>
+          <p class="text-gray-600 mt-1">
+            Click the "Sign Up" button in the top right corner and follow the
+            registration process.
+          </p>
+        </div>
+        <div>
+          <h3 class="font-medium text-gray-900">How do I start learning?</h3>
+          <p class="text-gray-600 mt-1">
+            Browse our courses page to find a subject that interests you and
+            start your learning journey.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">
+        Account & Profile
+      </h2>
+      <div class="space-y-4">
+        <div>
+          <h3 class="font-medium text-gray-900">How do I update my profile?</h3>
+          <p class="text-gray-600 mt-1">
+            Visit your dashboard to update your profile information, including
+            your username and bio.
+          </p>
+        </div>
+        <div>
+          <h3 class="font-medium text-gray-900">What are energy points?</h3>
+          <p class="text-gray-600 mt-1">
+            Energy points are earned by completing lessons and participating in
+            discussions.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Need More Help?</h2>
+      <p class="text-gray-600">
+        If you can't find the answer you're looking for, please contact us at
+        <a
+          href="mailto:support@eldiiaracademy.com"
+          class="text-primary-600 hover:text-primary-700"
+          >support@eldiiaracademy.com</a
+        >
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

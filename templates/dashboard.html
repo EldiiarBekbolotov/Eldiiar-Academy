@@ -92,8 +92,29 @@ endblock %} {% block content %}
     <!-- Login Activity -->
     <div class="bg-white rounded-lg shadow p-6">
       <h3 class="text-xl font-semibold mb-4">Login Activity</h3>
-      <div id="loginActivityChart" class="w-full h-48">
-        <!-- Chart will be rendered here -->
+      <div class="flex justify-end mb-2">
+        <button id="prevYearBtn" class="px-2 py-1 border rounded mr-2">
+          Previous Year
+        </button>
+        <button id="nextYearBtn" class="px-2 py-1 border rounded">
+          Next Year
+        </button>
+      </div>
+      <div id="loginActivity" class="w-full h-48 overflow-x-auto">
+        <div class="min-w-full">
+          <div class="grid grid-cols-7 gap-1 mb-1">
+            <div class="text-xs text-center text-gray-500">Mon</div>
+            <div class="text-xs text-center text-gray-500">Tue</div>
+            <div class="text-xs text-center text-gray-500">Wed</div>
+            <div class="text-xs text-center text-gray-500">Thu</div>
+            <div class="text-xs text-center text-gray-500">Fri</div>
+            <div class="text-xs text-center text-gray-500">Sat</div>
+            <div class="text-xs text-center text-gray-500">Sun</div>
+          </div>
+          <div id="activityGrid" class="grid grid-cols-7 gap-1">
+            <!-- Activity cells will be inserted here -->
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -189,62 +210,26 @@ endblock %} {% block content %}
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // Fetch login activity data
-  async function fetchLoginActivity() {
+  console.log("Script started");
+
+  let currentYear = new Date().getFullYear();
+  let minYear = currentYear;
+  let maxYear = currentYear;
+
+  async function fetchLoginActivity(year = currentYear) {
+    console.log("Fetching login activity...");
     try {
       const response = await fetch(
         "/api/profile/{{ profile.id }}/login-activity"
       );
       const data = await response.json();
+      console.log("Received data:", data);
 
       if (response.ok) {
-        document.getElementById("totalLogins").textContent = data.totalLogins;
-
-        // Create login activity chart
-        const ctx = document
-          .getElementById("loginActivityChart")
-          .getContext("2d");
-        new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: data.labels,
-            datasets: [
-              {
-                label: "Login Activity",
-                data: data.values,
-                backgroundColor: data.values.map((v) =>
-                  v > 0 ? "#10B981" : "#E5E7EB"
-                ),
-                borderWidth: 0,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 1,
-                ticks: {
-                  display: false,
-                },
-              },
-              x: {
-                ticks: {
-                  display: false,
-                },
-              },
-            },
-            plugins: {
-              legend: {
-                display: false,
-              },
-            },
-          },
-        });
+        document.getElementById("totalLogins").textContent =
+          data.totalLogins || "0";
+        renderActivity(data, year);
       }
     } catch (error) {
       console.error("Error fetching login activity:", error);
@@ -252,8 +237,90 @@ endblock %} {% block content %}
     }
   }
 
-  // Load login activity when page loads
-  document.addEventListener("DOMContentLoaded", fetchLoginActivity);
+  function renderActivity(data, year) {
+    console.log("Starting activity render...");
+    try {
+      // Create a map of dates to login counts
+      const activityMap = new Map();
+      data.labels.forEach((label, index) => {
+        const date = new Date(label);
+        if (date.getFullYear() === year) {
+          const dateStr = date.toISOString().split("T")[0];
+          activityMap.set(dateStr, data.values[index]);
+        }
+      });
+
+      // Get the first day of the year
+      const firstDay = new Date(year, 0, 1);
+      const startingDay = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+      // Create the activity grid
+      const grid = document.getElementById("activityGrid");
+      grid.innerHTML = "";
+
+      // Add empty cells for days before the first of the year
+      for (let i = 0; i < startingDay; i++) {
+        const cell = document.createElement("div");
+        cell.className = "aspect-square bg-gray-100 rounded";
+        grid.appendChild(cell);
+      }
+
+      // Add cells for each day of the year
+      const daysInYear =
+        (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
+      for (let i = 0; i < daysInYear; i++) {
+        const date = new Date(year, 0, i + 1);
+        const dateStr = date.toISOString().split("T")[0];
+        const count = activityMap.get(dateStr) || 0;
+
+        const cell = document.createElement("div");
+        cell.className = `aspect-square rounded transition-colors duration-200 ${
+          count === 0
+            ? "bg-gray-100"
+            : count === 1
+            ? "bg-blue-200"
+            : count === 2
+            ? "bg-blue-300"
+            : count === 3
+            ? "bg-blue-400"
+            : "bg-blue-500"
+        }`;
+
+        // Add tooltip
+        cell.title = `${dateStr}: ${count} login${count !== 1 ? "s" : ""}`;
+
+        grid.appendChild(cell);
+      }
+
+      // Update year navigation buttons
+      document.getElementById("prevYearBtn").disabled = year <= minYear;
+      document.getElementById("nextYearBtn").disabled = year >= maxYear;
+
+      console.log("Activity rendered successfully");
+    } catch (error) {
+      console.error("Error rendering activity:", error);
+    }
+  }
+
+  // Initialize when DOM is ready
+  document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM loaded, initializing...");
+    fetchLoginActivity(currentYear);
+
+    document.getElementById("prevYearBtn").addEventListener("click", () => {
+      if (currentYear > minYear) {
+        currentYear--;
+        fetchLoginActivity(currentYear);
+      }
+    });
+
+    document.getElementById("nextYearBtn").addEventListener("click", () => {
+      if (currentYear < maxYear) {
+        currentYear++;
+        fetchLoginActivity(currentYear);
+      }
+    });
+  });
 
   // Modal handling
   const editProfileModal = document.getElementById("editProfileModal");

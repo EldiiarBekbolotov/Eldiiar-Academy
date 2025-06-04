@@ -1,7 +1,7 @@
 How to run the program using the terminal:
 
 <pre><code>
-python -m venv/venv
+bash python -m venv/venv # if this doesn't work, python -m venv/venv
 source venv/bin/activate
 
 pip install -r requirements.txt

@@ -1,0 +1,87 @@
+{% extends "base.html" %} {% block title %}Privacy Policy - Eldiiar Academy{%
+endblock %} {% block content %}
+<div class="max-w-4xl mx-auto py-8">
+  <h1 class="text-3xl font-bold text-gray-900 mb-8">Privacy Policy</h1>
+
+  <div class="prose prose-lg">
+    <p class="text-gray-600 mb-6">
+      Last updated: {{ now.strftime('%B %d, %Y') }}
+    </p>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold text-gray-900 mb-4">
+        1. Information We Collect
+      </h2>
+      <p class="text-gray-600 mb-4">
+        We collect information that you provide directly to us, including:
+      </p>
+      <ul class="list-disc pl-6 text-gray-600 mb-4">
+        <li>Account information (email, username, password)</li>
+        <li>Profile information (bio, avatar)</li>
+        <li>Learning progress and course completion data</li>
+        <li>Comments and discussions you participate in</li>
+      </ul>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold text-gray-900 mb-4">
+        2. How We Use Your Information
+      </h2>
+      <p class="text-gray-600 mb-4">We use the information we collect to:</p>
+      <ul class="list-disc pl-6 text-gray-600 mb-4">
+        <li>Provide, maintain, and improve our services</li>
+        <li>Track your learning progress and achievements</li>
+        <li>Send you important updates about our services</li>
+        <li>Respond to your comments and questions</li>
+        <li>Monitor and analyze trends and usage</li>
+      </ul>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold text-gray-900 mb-4">
+        3. Information Sharing
+      </h2>
+      <p class="text-gray-600 mb-4">
+        We do not sell or rent your personal information to third parties. We
+        may share your information in the following circumstances:
+      </p>
+      <ul class="list-disc pl-6 text-gray-600 mb-4">
+        <li>With your consent</li>
+        <li>To comply with legal obligations</li>
+        <li>To protect our rights and safety</li>
+      </ul>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold text-gray-900 mb-4">
+        4. Data Security
+      </h2>
+      <p class="text-gray-600 mb-4">
+        We implement appropriate security measures to protect your personal
+        information. However, no method of transmission over the Internet is
+        100% secure.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Your Rights</h2>
+      <p class="text-gray-600 mb-4">You have the right to:</p>
+      <ul class="list-disc pl-6 text-gray-600 mb-4">
+        <li>Access your personal information</li>
+        <li>Correct inaccurate information</li>
+        <li>Request deletion of your information</li>
+        <li>Opt-out of marketing communications</li>
+      </ul>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold text-gray-900 mb-4">6. Contact Us</h2>
+      <p class="text-gray-600 mb-4">
+        If you have any questions about this Privacy Policy, please contact us
+        at:
+      </p>
+      <p class="text-gray-600">Email: privacy@eldiiaracademy.com</p>
+    </section>
+  </div>
+</div>
+{% endblock %}
