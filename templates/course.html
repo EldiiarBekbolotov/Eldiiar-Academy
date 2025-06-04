@@ -16,7 +16,7 @@ Academy{% endblock %} {% block content %}
   <div class="mb-8">
     <button
       onclick="showModal('createUnitModal')"
-      class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
     >
       Add New Unit
     </button>
@@ -52,7 +52,10 @@ Academy{% endblock %} {% block content %}
                   >{{ lesson.lesson_type|title }}</span
                 >
                 {% if lesson.completed %}
-                <span class="text-sm text-green-600">✓ Completed</span>
+                <span class="text-sm text-green-600"
+                  ><span class="material-symbols-outlined">task_alt</span>
+                  Completed</span
+                >
                 {% endif %}
               </div>
             </div>
@@ -87,7 +90,7 @@ Academy{% endblock %} {% block content %}
             id="unitTitle"
             name="title"
             required
-            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
         <div class="flex justify-end gap-4">
@@ -100,7 +103,7 @@ Academy{% endblock %} {% block content %}
           </button>
           <button
             type="submit"
-            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            class="px-4 py-2 bg-primary-500 text-white rounded hover:bg-primary-600"
           >
             Create Unit
           </button>
@@ -127,7 +130,7 @@ Academy{% endblock %} {% block content %}
             id="lessonTitle"
             name="title"
             required
-            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
         <div class="mb-4">
@@ -139,7 +142,7 @@ Academy{% endblock %} {% block content %}
             name="lesson_type"
             required
             onchange="toggleLessonFields()"
-            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             <option value="text">Text Lesson</option>
             <option value="video">Video Lesson</option>
@@ -154,7 +157,7 @@ Academy{% endblock %} {% block content %}
             id="lessonContent"
             name="content"
             rows="4"
-            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
           ></textarea>
         </div>
         <div id="videoContent" class="mb-4 hidden">
@@ -165,7 +168,7 @@ Academy{% endblock %} {% block content %}
             type="url"
             id="videoUrl"
             name="video_url"
-            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
             placeholder="https://www.youtube.com/watch?v=..."
           />
         </div>
@@ -177,7 +180,7 @@ Academy{% endblock %} {% block content %}
             id="quizData"
             name="quiz_data"
             rows="4"
-            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
             placeholder='{"questions": [{"question": "Question 1", "options": ["A", "B", "C"], "correct": 0}]}'
           ></textarea>
         </div>
@@ -191,7 +194,7 @@ Academy{% endblock %} {% block content %}
           </button>
           <button
             type="submit"
-            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
           >
             Create Lesson
           </button>

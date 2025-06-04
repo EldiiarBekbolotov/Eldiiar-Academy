@@ -45,7 +45,7 @@
                                    class="block px-3 py-2 rounded {% if l.id == lesson.id %}bg-blue-100 text-blue-700{% else %}hover:bg-gray-100{% endif %}">
                                     {{ l.title }}
                                     {% if l.completed %}
-                                    <span class="ml-2 text-green-500">✓</span>
+                                    <span class="ml-2 text-green-500 material-symbols-outlined">task_alt</span>
                                     {% endif %}
                                 </a>
                             </li>
@@ -113,19 +113,15 @@
                         onclick="markLessonComplete()"
                         class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2"
                     >
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span>Mark as Complete</span>
+                        Mark as Complete 
+                        <span class="material-symbols-outlined">task_alt</span>
                     </button>
                 </div>
                 {% elif lesson.completed %}
                 <div class="mt-6 flex justify-end">
                     <div class="bg-green-100 text-green-800 px-6 py-2 rounded-lg flex items-center space-x-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span>Completed</span>
+                        
+                        Completed <span class="material-symbols-outlined">task_alt</span>
                     </div>
                 </div>
                 {% endif %}

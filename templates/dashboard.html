@@ -2,10 +2,12 @@
 endblock %} {% block content %}
 <div class="max-w-4xl mx-auto">
   <!-- Profile Section -->
-  <div class="bg-white rounded-lg shadow p-8 mt-8 mb-8">
+  <div
+    class="bg-white rounded-lg border-2 border-solid border-gray-200 p-8 mt-8 mb-8"
+  >
     <div class="flex items-center space-x-4 mb-6">
       <div
-        class="w-16 h-16 rounded-full bg-blue-200 flex items-center justify-center text-2xl font-bold text-blue-700"
+        class="w-16 h-16 rounded-full bg-primary-200 flex items-center justify-center text-2xl font-bold text-primary-700"
       >
         {{ profile.avatar or (profile.username[:2]|upper) }}
       </div>
@@ -18,52 +20,67 @@ endblock %} {% block content %}
       <div class="ml-auto">
         <button
           id="editProfileBtn"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          class="bg-primary-600 text-white mb-2 mr-2 px-4 py-2 rounded hover:bg-primary-700"
         >
-          Edit Profile
+          <i class="material-symbols-outlined">edit</i> Edit
         </button>
         <button
           id="deleteProfileBtn"
-          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 ml-2"
+          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
         >
-          Delete Account
+          <i class="material-symbols-outlined">delete</i> Delete
         </button>
       </div>
     </div>
     <p id="profileBio" class="mb-4 text-gray-700">{{ profile.bio }}</p>
-    <div class="mb-4">
-      <span class="font-semibold">Badges:</span>
-      <div class="flex flex-wrap gap-2 mt-2">
-        {% if profile.is_admin %}
-        <span
-          class="bg-yellow-400 text-white text-xs font-bold px-3 py-1 rounded-full"
-          >Admin</span
-        >
-        {% endif %} {% if profile.badges and profile.badges|length > 0 %} {% for
-        badge in profile.badges %}
-        <span
-          class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full"
-          >{{ badge }}</span
-        >
-        {% endfor %} {% elif not profile.is_admin %}
-        <span class="text-gray-400"
-          >No badges yet. Complete lessons to earn badges!</span
-        >
-        {% endif %}
-      </div>
+  </div>
+
+  <div
+    class="bg-white rounded-lg border-2 border-solid border-gray-200 p-8 mt-8 mb-8"
+  >
+    <h3 class="text-xl font-semibold mb-4">Login Activity</h3>
+    <div class="flex justify-center mb-2">
+      <button id="prevYearBtn" class="px-2 py-1 border rounded mr-2">
+        Last Year
+      </button>
+      <button id="nextYearBtn" class="px-2 py-1 border rounded">
+        Next Year
+      </button>
     </div>
-    <div>
-      <span class="font-semibold">Energy Points:</span>
-      <span class="ml-2 text-blue-600 font-bold"
-        >{{ profile.energy_points }}</span
-      >
+    <div class="flex justify-center mb-2">
+      <div class="overflow-x-auto">
+        <!-- MONTH LABELS -->
+        <div
+          id="monthLabels"
+          class="flex text-xs text-gray-500 ml-[32px] mb-1 h-[12px]"
+        ></div>
+
+        <!-- GRAPH + WEEK-DAY LABELS -->
+        <div class="flex">
+          <!-- Week-day labels down the left side -->
+          <div
+            class="flex flex-col text-xs text-gray-400 mr-[2px] leading-[11px] select-none"
+          >
+            <div class="h-[12px]">Sun</div>
+            <div class="h-[12px]">Mon</div>
+            <div class="h-[12px]">Tue</div>
+            <div class="h-[12px]">Wed</div>
+            <div class="h-[12px]">Thu</div>
+            <div class="h-[12px]">Fri</div>
+            <div class="h-[12px]">Sat</div>
+          </div>
+
+          <!-- Week columns will be injected here -->
+          <div id="activityGrid" class="flex"></div>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Stats Section -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
     <!-- Account Stats -->
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-white rounded-lg border-2 border-solid border-gray-200 p-6">
       <h3 class="text-xl font-semibold mb-4">Account Stats</h3>
       <div class="space-y-3">
         <div class="flex justify-between">
@@ -89,32 +106,35 @@ endblock %} {% block content %}
       </div>
     </div>
 
-    <!-- Login Activity -->
-    <div class="bg-white rounded-lg shadow p-6">
-      <h3 class="text-xl font-semibold mb-4">Login Activity</h3>
-      <div class="flex justify-end mb-2">
-        <button id="prevYearBtn" class="px-2 py-1 border rounded mr-2">
-          Previous Year
-        </button>
-        <button id="nextYearBtn" class="px-2 py-1 border rounded">
-          Next Year
-        </button>
-      </div>
-      <div id="loginActivity" class="w-full h-48 overflow-x-auto">
-        <div class="min-w-full">
-          <div class="grid grid-cols-7 gap-1 mb-1">
-            <div class="text-xs text-center text-gray-500">Mon</div>
-            <div class="text-xs text-center text-gray-500">Tue</div>
-            <div class="text-xs text-center text-gray-500">Wed</div>
-            <div class="text-xs text-center text-gray-500">Thu</div>
-            <div class="text-xs text-center text-gray-500">Fri</div>
-            <div class="text-xs text-center text-gray-500">Sat</div>
-            <div class="text-xs text-center text-gray-500">Sun</div>
-          </div>
-          <div id="activityGrid" class="grid grid-cols-7 gap-1">
-            <!-- Activity cells will be inserted here -->
-          </div>
+    <div class="bg-white rounded-lg border-2 border-solid border-gray-200 p-6">
+      <h3 class="text-xl font-semibold mb-4">Showcase</h3>
+
+      <div class="mb-4">
+        <span class="font-semibold">Badges:</span>
+        <div class="flex flex-wrap gap-2 mt-2">
+          {% if profile.is_admin %}
+          <span
+            class="bg-yellow-400 text-white text-xs font-bold px-3 py-1 rounded-full"
+            >Admin</span
+          >
+          {% endif %} {% if profile.badges and profile.badges|length > 0 %} {%
+          for badge in profile.badges %}
+          <span
+            class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full"
+            >{{ badge }}</span
+          >
+          {% endfor %} {% elif not profile.is_admin %}
+          <span class="text-gray-400"
+            >No badges yet. Complete lessons to earn badges!</span
+          >
+          {% endif %}
         </div>
+      </div>
+      <div>
+        <span class="font-semibold">Energy Points:</span>
+        <span class="ml-2 text-blue-600 font-bold"
+          >{{ profile.energy_points }}</span
+        >
       </div>
     </div>
   </div>
@@ -238,68 +258,120 @@ endblock %} {% block content %}
   }
 
   function renderActivity(data, year) {
-    console.log("Starting activity render...");
-    try {
-      // Create a map of dates to login counts
-      const activityMap = new Map();
-      data.labels.forEach((label, index) => {
-        const date = new Date(label);
-        if (date.getFullYear() === year) {
-          const dateStr = date.toISOString().split("T")[0];
-          activityMap.set(dateStr, data.values[index]);
+    const CELL = 10; // square size  (px)
+    const GAP = 2; // gap between weeks (px)
+    const WEEK_GUTTER = `${GAP}px`; // css helper
+
+    const activity = new Map();
+    data.labels.forEach((label, i) => {
+      const d = new Date(label);
+      if (d.getFullYear() === year) {
+        activity.set(label.slice(0, 10), data.values[i]);
+      }
+    });
+
+    const jan1 = new Date(year, 0, 1);
+    const dec31 = new Date(year, 11, 31);
+
+    const firstSunday = new Date(jan1);
+    firstSunday.setDate(jan1.getDate() - jan1.getDay()); // back to Sun
+
+    const lastSaturday = new Date(dec31);
+    lastSaturday.setDate(dec31.getDate() + (6 - dec31.getDay())); // fwd to Sat
+
+    const days = [];
+    for (
+      let d = new Date(firstSunday);
+      d <= lastSaturday;
+      d.setDate(d.getDate() + 1)
+    ) {
+      days.push(new Date(d));
+    }
+
+    const weeks = [];
+    for (let i = 0; i < days.length; i += 7) {
+      weeks.push(days.slice(i, i + 7));
+    }
+
+    const grid = document.getElementById("activityGrid");
+    const months = document.getElementById("monthLabels");
+    grid.innerHTML = "";
+    months.innerHTML = "";
+
+    weeks.forEach((week) => {
+      const col = document.createElement("div");
+      col.className = "flex flex-col";
+      col.style.rowGap = WEEK_GUTTER;
+      col.style.marginRight = WEEK_GUTTER;
+
+      week.forEach((day) => {
+        const iso = day.toISOString().slice(0, 10);
+        const count = activity.get(iso) || 0;
+
+        const box = document.createElement("div");
+        box.className =
+          `w-[${CELL}px] h-[${CELL}px] rounded-[2px] ` +
+          (count === 0
+            ? "bg-gray-100"
+            : count === 1
+            ? "bg-green-200"
+            : count === 2
+            ? "bg-green-300"
+            : count === 3
+            ? "bg-green-400"
+            : "bg-green-500");
+
+        box.title = `${iso}: ${count} login${count !== 1 ? "s" : ""}`;
+        col.appendChild(box);
+      });
+
+      grid.appendChild(col);
+    });
+
+    // remove the last inter-column gap so the right edge is flush
+    if (grid.lastChild) grid.lastChild.style.marginRight = "0";
+
+    months.innerHTML = "";
+
+    // turn the monthLabels container into a CSS grid matching the graph’s columns
+    months.style.display = "grid";
+    months.style.gridTemplateColumns = `repeat(${weeks.length}, ${CELL}px)`;
+    months.style.columnGap = `${GAP}px`;
+
+    // for each calendar month, find the first and last week-column that contain any day in that month
+    for (let m = 0; m < 12; m++) {
+      let first = Infinity,
+        last = -1;
+
+      weeks.forEach((weekDates, wi) => {
+        if (
+          weekDates.some((d) => d.getMonth() === m && d.getFullYear() === year)
+        ) {
+          first = Math.min(first, wi);
+          last = Math.max(last, wi);
         }
       });
 
-      // Get the first day of the year
-      const firstDay = new Date(year, 0, 1);
-      const startingDay = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
-
-      // Create the activity grid
-      const grid = document.getElementById("activityGrid");
-      grid.innerHTML = "";
-
-      // Add empty cells for days before the first of the year
-      for (let i = 0; i < startingDay; i++) {
-        const cell = document.createElement("div");
-        cell.className = "aspect-square bg-gray-100 rounded";
-        grid.appendChild(cell);
+      // if this month actually appears in the year…
+      if (last >= first) {
+        const span = last - first + 1;
+        const label = document.createElement("div");
+        label.textContent = new Date(year, m, 1).toLocaleString("default", {
+          month: "short",
+        });
+        // place it so it spans exactly those week‐columns:
+        label.style.gridColumn = `${first + 1} / ${first + 1 + span}`;
+        label.className = "text-xs text-gray-500";
+        label.style.gridRow = "1";
+        label.style.textAlign = "center";
+        months.appendChild(label);
       }
-
-      // Add cells for each day of the year
-      const daysInYear =
-        (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
-      for (let i = 0; i < daysInYear; i++) {
-        const date = new Date(year, 0, i + 1);
-        const dateStr = date.toISOString().split("T")[0];
-        const count = activityMap.get(dateStr) || 0;
-
-        const cell = document.createElement("div");
-        cell.className = `aspect-square rounded transition-colors duration-200 ${
-          count === 0
-            ? "bg-gray-100"
-            : count === 1
-            ? "bg-blue-200"
-            : count === 2
-            ? "bg-blue-300"
-            : count === 3
-            ? "bg-blue-400"
-            : "bg-blue-500"
-        }`;
-
-        // Add tooltip
-        cell.title = `${dateStr}: ${count} login${count !== 1 ? "s" : ""}`;
-
-        grid.appendChild(cell);
-      }
-
-      // Update year navigation buttons
-      document.getElementById("prevYearBtn").disabled = year <= minYear;
-      document.getElementById("nextYearBtn").disabled = year >= maxYear;
-
-      console.log("Activity rendered successfully");
-    } catch (error) {
-      console.error("Error rendering activity:", error);
     }
+
+    document.getElementById("totalLogins").textContent =
+      data.totalLogins || "0";
+    document.getElementById("prevYearBtn").disabled = year <= minYear;
+    document.getElementById("nextYearBtn").disabled = year >= maxYear;
   }
 
   // Initialize when DOM is ready
