@@ -1,47 +1,158 @@
 {% extends "base.html" %} {% block title %}Blog - Eldiiar Academy{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-8">
+
+<style>
+  #loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background-color: rgb(182, 32, 251);
+    z-index: 1000;
+    transition: width 0.4s ease;
+  }
+</style>
+
+<div id="loading-bar"></div>
+
+<div id="scene-list" class="max-w-4xl mx-auto px-4 py-8">
   <h1 class="text-3xl font-bold text-gray-900 mb-6">Blog</h1>
 
-  <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
+  <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8">
     <div class="flex">
       <div class="flex-shrink-0">
-        <span class="material-symbols-outlined text-yellow-400">info</span>
+        <span class="material-symbols-outlined text-blue-400"
+          >local_fire_department</span
+        >
       </div>
-      <div class="ml-3">
-        <p class="text-sm text-yellow-700">
-          Our blog is currently under development. Check back soon for
-          educational articles, learning tips, and platform updates!
+      <div class="ml-3 mt-1">
+        <p class="text-sm text-blue-700">
+          Weekly blog posts to help you succeed
         </p>
       </div>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-    <!-- Placeholder Blog Posts -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <div class="p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-2">
-          Coming Soon: Learning Tips
-        </h2>
-        <p class="text-gray-600 mb-4">
-          Stay tuned for our upcoming series on effective learning strategies...
-        </p>
-        <div class="text-sm text-gray-500">Coming soon</div>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <div class="p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-2">
-          Platform Updates
-        </h2>
-        <p class="text-gray-600 mb-4">
-          Learn about our latest features and improvements...
-        </p>
-        <div class="text-sm text-gray-500">Coming soon</div>
-      </div>
-    </div>
-  </div>
+  <div id="blog-container" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
 </div>
+
+<div id="scene-detail" class="max-w-3xl mx-auto px-4 py-8 hidden">
+  <button
+    onclick="switchScene('list')"
+    class="mb-4 text-blue-600 hover:underline"
+  >
+    &larr; Back to Blog
+  </button>
+  <h2 id="blog-title" class="text-2xl font-bold mb-2"></h2>
+  <div class="text-sm text-gray-500 mb-4" id="blog-meta"></div>
+  <div id="blog-content" class="text-gray-700"></div>
+</div>
+
+<script>
+  const blogData = [
+    {
+      id: 1,
+      title: "Coming Soon: Learning Tips",
+      author: "Eldiiar Bekbolotov [Admin]",
+      posted: "2025-06-01",
+      updated: "2025-06-02",
+      excerpt:
+        "Stay tuned for our upcoming series on effective learning strategies...",
+      content:
+        "Learning isn’t just about time spent, it’s about method.<br>Spaced repetition beats cramming every time.<br>Use active recall rather than passive review.<br>Set goals for each study session, no matter how small.<br>Minimize distractions to improve retention.<br>Celebrate small wins to stay motivated.",
+    },
+    {
+      id: 3,
+      title: "Micro Habits that Make Macro Results",
+      author: "Eldiiar Bekbolotov [Admin]",
+      posted: "2025-05-15",
+      updated: "2025-05-20",
+      excerpt: "Tiny consistent actions can lead to huge results...",
+      content:
+        "Start your day by writing one thing you're grateful for.<br>Review your calendar every morning before you begin.<br>Read one page of a book instead of aiming for a chapter.<br>Take 5 deep breaths before reacting to stress.<br>Place your phone out of reach when focusing.<br>Small wins snowball. Stay consistent.",
+    },
+    {
+      id: 4,
+      title: "How to Never Forget What You Learn",
+      author: "Eldiiar Bekbolotov [Admin]",
+      posted: "2025-04-29",
+      updated: "2025-05-01",
+      excerpt: "Forget forgetting, here's how to remember anything longer...",
+      content:
+        "Teach what you learn to someone else within 24 hours.<br>Use images and weird stories to encode dry facts.<br>Spaced repetition makes memory stick long term.<br>Quiz yourself often, don’t just reread.<br>Chunk related info together to reduce overload.<br>Use apps like Anki or simple flashcards.",
+    },
+    {
+      id: 5,
+      title: "Digital Declutter for Learning Focus",
+      author: "Eldiiar Bekbolotov [Admin]",
+      posted: "2025-04-10",
+      updated: "2025-04-12",
+      excerpt: "Clear the digital noise and unlock better focus...",
+      content:
+        "Turn off non-critical app notifications today.<br>Use browser extensions to block distracting sites.<br>Organize your files into clear learning folders.<br>Unsubscribe from newsletters you don’t read.<br>Batch-check emails twice a day, not all day.<br>Decluttering your tech declutters your mind.",
+    },
+    {
+      id: 6,
+      title: "One Mindful Minute for Students",
+      author: "Eldiiar Bekbolotov [Admin]",
+      posted: "2025-03-22",
+      updated: "2025-03-23",
+      excerpt: "Feeling overwhelmed? Try this simple reset...",
+      content:
+        "Close your eyes and breathe in deeply for four counts.<br>Hold your breath for four. Then out slowly for four.<br>Bring your attention to what you hear, feel, smell.<br>Let go of judgment. Just notice your breath.<br>Use this before tests, study sessions, or public speaking.<br>One mindful minute beats hours of burnout.",
+    },
+  ];
+
+  const container = document.getElementById("blog-container");
+  blogData.forEach((blog) => {
+    const card = document.createElement("div");
+    card.className =
+      "bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition";
+    card.innerHTML = `
+      <div class="p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">${blog.title}</h2>
+        <p class="text-gray-600 mb-4">${blog.excerpt}</p>
+        <div class="text-sm text-gray-500">By ${blog.author}, ${blog.posted}</div>
+      </div>
+    `;
+    card.onclick = () => loadBlog(blog.id);
+    container.appendChild(card);
+  });
+
+  function switchScene(scene) {
+    document.getElementById("scene-list").classList.add("hidden");
+    document.getElementById("scene-detail").classList.add("hidden");
+    document.getElementById(`scene-${scene}`).classList.remove("hidden");
+  }
+
+  function fakeLoading(callback) {
+    const bar = document.getElementById("loading-bar");
+    bar.style.display = "block";
+    bar.style.width = "0%";
+    setTimeout(() => {
+      bar.style.width = "100%";
+    }, 50);
+    setTimeout(() => {
+      bar.style.display = "none";
+      bar.style.width = "0%";
+      callback();
+    }, 600);
+  }
+
+  function loadBlog(id) {
+    fakeLoading(() => {
+      const blog = blogData.find((b) => b.id === id);
+      document.getElementById("blog-title").innerText = blog.title;
+      document.getElementById(
+        "blog-meta"
+      ).innerText = `By ${blog.author} • Posted: ${blog.posted} • Updated: ${blog.updated}`;
+      const contentDiv = document.getElementById("blog-content");
+      contentDiv.innerHTML = blog.content;
+      switchScene("detail");
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    });
+  }
+</script>
+
 {% endblock %}

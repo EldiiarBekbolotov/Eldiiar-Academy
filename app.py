@@ -1834,6 +1834,144 @@ def api_lesson(lesson_id):
             return jsonify({"error": str(e)}), 500
 
 
+@app.route("/api/lessons/<lesson_id>", methods=["DELETE", "PUT"])
+def api_lessons_manage(lesson_id):
+    if not session.get("user_id"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        # Check if user is admin
+        cur.execute(
+            "SELECT is_admin FROM profiles WHERE id = %s", (session["user_id"],)
+        )
+        profile = cur.fetchone()
+        if not profile or not profile["is_admin"]:
+            conn.close()
+            return jsonify({"error": "Only admins can manage lessons"}), 403
+
+        # Check if lesson exists
+        cur.execute("SELECT id FROM lessons WHERE id = %s", (lesson_id,))
+        if not cur.fetchone():
+            conn.close()
+            return jsonify({"error": "Lesson not found"}), 404
+
+        if request.method == "DELETE":
+            # Delete the lesson (cascade will handle related records)
+            cur.execute("DELETE FROM lessons WHERE id = %s RETURNING id", (lesson_id,))
+            deleted = cur.fetchone()
+            conn.commit()
+            conn.close()
+
+            if not deleted:
+                return jsonify({"error": "Failed to delete lesson"}), 500
+
+            return jsonify({"message": "Lesson deleted successfully"}), 200
+
+        elif request.method == "PUT":
+            data = request.get_json()
+            if not data:
+                conn.close()
+                return jsonify({"error": "No data provided"}), 400
+
+            # Validate required fields
+            if not data.get("title"):
+                conn.close()
+                return jsonify({"error": "Title is required"}), 400
+
+            # Validate lesson type if provided
+            if data.get("lesson_type") and data["lesson_type"] not in [
+                "text",
+                "video",
+                "quiz",
+            ]:
+                conn.close()
+                return jsonify(
+                    {"error": "Invalid lesson type. Must be 'text', 'video', or 'quiz'"}
+                ), 400
+
+            # Validate video URL if lesson type is video
+            if data.get("lesson_type") == "video" and not data.get("video_url"):
+                conn.close()
+                return jsonify(
+                    {"error": "Video URL is required for video lessons"}
+                ), 400
+
+            # Validate quiz data if lesson type is quiz
+            if data.get("lesson_type") == "quiz":
+                if not data.get("quiz_data"):
+                    conn.close()
+                    return jsonify(
+                        {"error": "Quiz data is required for quiz lessons"}
+                    ), 400
+                try:
+                    # Ensure quiz_data is valid JSON
+                    if isinstance(data["quiz_data"], str):
+                        data["quiz_data"] = json.loads(data["quiz_data"])
+                    # Validate quiz data structure
+                    if (
+                        not isinstance(data["quiz_data"], dict)
+                        or "questions" not in data["quiz_data"]
+                    ):
+                        conn.close()
+                        return jsonify(
+                            {
+                                "error": "Invalid quiz data format. Must include 'questions' array"
+                            }
+                        ), 400
+                except json.JSONDecodeError:
+                    conn.close()
+                    return jsonify(
+                        {"error": "Invalid quiz data format. Please check your JSON"}
+                    ), 400
+
+            # Convert quiz_data to JSON string if it exists
+            quiz_data = None
+            if data.get("quiz_data"):
+                quiz_data = json.dumps(data["quiz_data"])
+
+            # Update the lesson
+            cur.execute(
+                """
+                UPDATE lessons 
+                SET title = %s,
+                    content = %s,
+                    lesson_type = %s,
+                    video_url = %s,
+                    quiz_data = %s,
+                    updated_at = CURRENT_TIMESTAMP,
+                    updated_by = %s
+                WHERE id = %s
+                RETURNING *
+                """,
+                (
+                    data["title"],
+                    data.get("content", ""),
+                    data.get("lesson_type", "text"),
+                    data.get("video_url", ""),
+                    quiz_data,
+                    session["user_id"],
+                    lesson_id,
+                ),
+            )
+            updated_lesson = cur.fetchone()
+            conn.commit()
+            conn.close()
+
+            if not updated_lesson:
+                return jsonify({"error": "Failed to update lesson"}), 500
+
+            return jsonify(dict(updated_lesson)), 200
+
+    except Exception as e:
+        print(f"Error managing lesson: {str(e)}")
+        if "conn" in locals():
+            conn.close()
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/api/comments/<lesson_id>", methods=["GET", "POST", "DELETE"])
 def api_comments(lesson_id):
     if request.method == "GET":
