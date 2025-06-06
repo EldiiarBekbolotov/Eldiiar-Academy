@@ -1,8 +1,12 @@
-{% extends 'base.html' %} {% block title %}Login | Eldiiar Academy{% endblock %}
+{% extends "base.html" %} {% block title %}Login | Eldiiar Academy{% endblock %}
 {% block content %}
+<!-- main container for login form -->
 <div class="max-w-md mx-auto bg-white rounded-lg shadow p-8 mt-8">
+  <!-- page title -->
   <h1 class="text-2xl font-bold text-blue-700 mb-6">Login</h1>
+  <!-- login form -->
   <form id="loginForm" class="space-y-4">
+    <!-- email input -->
     <div>
       <label for="email" class="block text-gray-700">Email</label>
       <input
@@ -13,6 +17,7 @@
         required
       />
     </div>
+    <!-- password input -->
     <div>
       <label for="password" class="block text-gray-700">Password</label>
       <input
@@ -23,6 +28,7 @@
         required
       />
     </div>
+    <!-- submit button -->
     <button
       type="submit"
       class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -30,12 +36,14 @@
       Login
     </button>
   </form>
+  <!-- signup link -->
   <p class="mt-4 text-center text-gray-600">
-    <br/>Don't have an account?
+    <br />Don't have an account?
     <a href="/signup" class="text-blue-600 hover:underline">Sign up</a>
   </p>
 </div>
 
+<!-- javascript for login form submission -->
 <script>
   document
     .getElementById("loginForm")

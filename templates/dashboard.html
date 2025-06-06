@@ -1,10 +1,12 @@
-{% extends 'base.html' %} {% block title %}Dashboard | Eldiiar Academy{%
+{% extends "base.html" %} {% block title %}Dashboard | Eldiiar Academy{%
 endblock %} {% block content %}
+<!-- main container for dashboard content -->
 <div class="max-w-4xl mx-auto">
-  <!-- Profile Section -->
+  <!-- profile section -->
   <div
     class="bg-white rounded-lg border-2 border-solid border-gray-200 p-8 mt-8 mb-8"
   >
+    <!-- profile header with avatar, username, and action buttons -->
     <div class="flex items-center space-x-4 mb-6">
       <div
         class="w-16 h-16 rounded-full bg-primary-200 flex items-center justify-center text-2xl font-bold text-primary-700"
@@ -17,6 +19,7 @@ endblock %} {% block content %}
         </h2>
         <p id="profileHandle" class="text-gray-500">@{{ profile.handle }}</p>
       </div>
+      <!-- profile action buttons -->
       <div class="ml-auto">
         <button
           id="editProfileBtn"
@@ -32,13 +35,16 @@ endblock %} {% block content %}
         </button>
       </div>
     </div>
+    <!-- profile bio -->
     <p id="profileBio" class="mb-4 text-gray-700">{{ profile.bio }}</p>
   </div>
 
+  <!-- login activity section -->
   <div
     class="bg-white rounded-lg border-2 border-solid border-gray-200 p-8 mt-8 mb-8"
   >
     <h3 class="text-xl font-semibold mb-4">Login Activity</h3>
+    <!-- year navigation buttons -->
     <div class="flex justify-center mb-2">
       <button id="prevYearBtn" class="px-2 py-1 border rounded mr-2">
         Last Year
@@ -49,15 +55,14 @@ endblock %} {% block content %}
     </div>
     <div class="flex justify-center mb-2">
       <div class="overflow-x-auto">
-        <!-- MONTH LABELS -->
+        <!-- month labels for activity grid -->
         <div
           id="monthLabels"
           class="flex text-xs text-gray-500 ml-[32px] mb-1 h-[12px]"
         ></div>
-
-        <!-- GRAPH + WEEK-DAY LABELS -->
+        <!-- activity grid with weekday labels -->
         <div class="flex">
-          <!-- Week-day labels down the left side -->
+          <!-- weekday labels -->
           <div
             class="flex flex-col text-xs text-gray-400 mr-[2px] leading-[11px] select-none"
           >
@@ -69,17 +74,16 @@ endblock %} {% block content %}
             <div class="h-[12px]">Fri</div>
             <div class="h-[12px]">Sat</div>
           </div>
-
-          <!-- Week columns will be injected here -->
+          <!-- activity grid container -->
           <div id="activityGrid" class="flex"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Stats Section -->
+  <!-- stats section -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-    <!-- Account Stats -->
+    <!-- account stats -->
     <div class="bg-white rounded-lg border-2 border-solid border-gray-200 p-6">
       <h3 class="text-xl font-semibold mb-4">Account Stats</h3>
       <div class="space-y-3">
@@ -105,10 +109,10 @@ endblock %} {% block content %}
         </div>
       </div>
     </div>
-
+    <!-- showcase section -->
     <div class="bg-white rounded-lg border-2 border-solid border-gray-200 p-6">
       <h3 class="text-xl font-semibold mb-4">Showcase</h3>
-
+      <!-- badges display -->
       <div class="mb-4">
         <span class="font-semibold">Badges:</span>
         <div class="flex flex-wrap gap-2 mt-2">
@@ -130,6 +134,7 @@ endblock %} {% block content %}
           {% endif %}
         </div>
       </div>
+      <!-- energy points display -->
       <div>
         <span class="font-semibold">Energy Points:</span>
         <span class="ml-2 text-blue-600 font-bold"
@@ -140,7 +145,7 @@ endblock %} {% block content %}
   </div>
 </div>
 
-<!-- Edit Profile Modal -->
+<!-- edit profile modal -->
 <div
   id="editProfileModal"
   class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center"
@@ -148,6 +153,7 @@ endblock %} {% block content %}
   <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
     <h3 class="text-xl font-semibold mb-4">Edit Profile</h3>
     <form id="editProfileForm" class="space-y-4">
+      <!-- username input -->
       <div>
         <label for="username" class="block text-gray-700">Username</label>
         <input
@@ -159,6 +165,7 @@ endblock %} {% block content %}
           required
         />
       </div>
+      <!-- handle input -->
       <div>
         <label for="handle" class="block text-gray-700">Handle</label>
         <input
@@ -170,6 +177,7 @@ endblock %} {% block content %}
           required
         />
       </div>
+      <!-- bio input -->
       <div>
         <label for="bio" class="block text-gray-700"
           >Bio (max 180 characters)</label
@@ -183,6 +191,7 @@ endblock %} {% block content %}
 {{ profile.bio }}</textarea
         >
       </div>
+      <!-- form action buttons -->
       <div class="flex justify-end space-x-2">
         <button
           type="button"
@@ -202,7 +211,7 @@ endblock %} {% block content %}
   </div>
 </div>
 
-<!-- Delete Account Modal -->
+<!-- delete account modal -->
 <div
   id="deleteAccountModal"
   class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center"
@@ -213,6 +222,7 @@ endblock %} {% block content %}
       Are you sure you want to delete your account? This action cannot be
       undone.
     </p>
+    <!-- modal action buttons -->
     <div class="flex justify-end space-x-2">
       <button
         id="cancelDeleteBtn"
@@ -230,13 +240,14 @@ endblock %} {% block content %}
   </div>
 </div>
 
+<!-- javascript for dashboard functionality -->
 <script>
-  console.log("Script started");
-
+  // initialize variables
   let currentYear = new Date().getFullYear();
   let minYear = currentYear;
   let maxYear = currentYear;
 
+  // fetch and display login activity
   async function fetchLoginActivity(year = currentYear) {
     console.log("Fetching login activity...");
     try {
@@ -257,11 +268,13 @@ endblock %} {% block content %}
     }
   }
 
+  // render login activity grid
   function renderActivity(data, year) {
-    const CELL = 10; // square size  (px)
+    const CELL = 10; // square size (px)
     const GAP = 2; // gap between weeks (px)
     const WEEK_GUTTER = `${GAP}px`; // css helper
 
+    // map login activity data
     const activity = new Map();
     data.labels.forEach((label, i) => {
       const d = new Date(label);
@@ -270,15 +283,15 @@ endblock %} {% block content %}
       }
     });
 
+    // calculate date range for the year
     const jan1 = new Date(year, 0, 1);
     const dec31 = new Date(year, 11, 31);
-
     const firstSunday = new Date(jan1);
-    firstSunday.setDate(jan1.getDate() - jan1.getDay()); // back to Sun
-
+    firstSunday.setDate(jan1.getDate() - jan1.getDay()); // back to Sunday
     const lastSaturday = new Date(dec31);
-    lastSaturday.setDate(dec31.getDate() + (6 - dec31.getDay())); // fwd to Sat
+    lastSaturday.setDate(dec31.getDate() + (6 - dec31.getDay())); // forward to Saturday
 
+    // generate days and weeks
     const days = [];
     for (
       let d = new Date(firstSunday);
@@ -287,17 +300,18 @@ endblock %} {% block content %}
     ) {
       days.push(new Date(d));
     }
-
     const weeks = [];
     for (let i = 0; i < days.length; i += 7) {
       weeks.push(days.slice(i, i + 7));
     }
 
+    // clear existing grid and month labels
     const grid = document.getElementById("activityGrid");
     const months = document.getElementById("monthLabels");
     grid.innerHTML = "";
     months.innerHTML = "";
 
+    // render weekly columns
     weeks.forEach((week) => {
       const col = document.createElement("div");
       col.className = "flex flex-col";
@@ -307,7 +321,6 @@ endblock %} {% block content %}
       week.forEach((day) => {
         const iso = day.toISOString().slice(0, 10);
         const count = activity.get(iso) || 0;
-
         const box = document.createElement("div");
         box.className =
           `w-[${CELL}px] h-[${CELL}px] rounded-[2px] ` +
@@ -320,7 +333,6 @@ endblock %} {% block content %}
             : count === 3
             ? "bg-green-400"
             : "bg-green-500");
-
         box.title = `${iso}: ${count} login${count !== 1 ? "s" : ""}`;
         col.appendChild(box);
       });
@@ -328,21 +340,18 @@ endblock %} {% block content %}
       grid.appendChild(col);
     });
 
-    // remove the last inter-column gap so the right edge is flush
+    // remove last column gap
     if (grid.lastChild) grid.lastChild.style.marginRight = "0";
 
-    months.innerHTML = "";
-
-    // turn the monthLabels container into a CSS grid matching the graph’s columns
+    // configure month labels as CSS grid
     months.style.display = "grid";
     months.style.gridTemplateColumns = `repeat(${weeks.length}, ${CELL}px)`;
     months.style.columnGap = `${GAP}px`;
 
-    // for each calendar month, find the first and last week-column that contain any day in that month
+    // render month labels
     for (let m = 0; m < 12; m++) {
       let first = Infinity,
         last = -1;
-
       weeks.forEach((weekDates, wi) => {
         if (
           weekDates.some((d) => d.getMonth() === m && d.getFullYear() === year)
@@ -352,14 +361,12 @@ endblock %} {% block content %}
         }
       });
 
-      // if this month actually appears in the year…
       if (last >= first) {
         const span = last - first + 1;
         const label = document.createElement("div");
         label.textContent = new Date(year, m, 1).toLocaleString("default", {
           month: "short",
         });
-        // place it so it spans exactly those week‐columns:
         label.style.gridColumn = `${first + 1} / ${first + 1 + span}`;
         label.className = "text-xs text-gray-500";
         label.style.gridRow = "1";
@@ -368,17 +375,19 @@ endblock %} {% block content %}
       }
     }
 
+    // update total logins and button states
     document.getElementById("totalLogins").textContent =
       data.totalLogins || "0";
     document.getElementById("prevYearBtn").disabled = year <= minYear;
     document.getElementById("nextYearBtn").disabled = year >= maxYear;
   }
 
-  // Initialize when DOM is ready
+  // initialize dashboard on DOM load
   document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM loaded, initializing...");
     fetchLoginActivity(currentYear);
 
+    // year navigation handlers
     document.getElementById("prevYearBtn").addEventListener("click", () => {
       if (currentYear > minYear) {
         currentYear--;
@@ -394,7 +403,7 @@ endblock %} {% block content %}
     });
   });
 
-  // Modal handling
+  // modal handling
   const editProfileModal = document.getElementById("editProfileModal");
   const deleteAccountModal = document.getElementById("deleteAccountModal");
   const editProfileBtn = document.getElementById("editProfileBtn");
@@ -403,32 +412,35 @@ endblock %} {% block content %}
   const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
   const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
 
+  // show edit profile modal
   editProfileBtn.addEventListener("click", () => {
     editProfileModal.classList.remove("hidden");
     editProfileModal.classList.add("flex");
   });
 
+  // show delete account modal
   deleteProfileBtn.addEventListener("click", () => {
     deleteAccountModal.classList.remove("hidden");
     deleteAccountModal.classList.add("flex");
   });
 
+  // hide edit profile modal
   cancelEditBtn.addEventListener("click", () => {
     editProfileModal.classList.add("hidden");
     editProfileModal.classList.remove("flex");
   });
 
+  // hide delete account modal
   cancelDeleteBtn.addEventListener("click", () => {
     deleteAccountModal.classList.add("hidden");
     deleteAccountModal.classList.remove("flex");
   });
 
-  // Handle profile update
+  // handle profile update
   document
     .getElementById("editProfileForm")
     .addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const username = document.getElementById("username").value.trim();
       const handle = document.getElementById("handle").value.trim();
       const bio = document.getElementById("bio").value.trim();
@@ -436,33 +448,28 @@ endblock %} {% block content %}
       try {
         const response = await fetch("/api/profile/{{ profile.id }}", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, handle, bio }),
         });
 
         const data = await response.json();
 
         if (response.ok) {
-          // Update the profile display
+          // update profile display
           document.getElementById("profileUsername").textContent = username;
           document.getElementById("profileHandle").textContent = `@${handle}`;
           document.getElementById("profileBio").textContent =
             bio || "No bio yet";
-
-          // Close the modal
+          // close modal
           document.getElementById("editProfileModal").classList.add("hidden");
           document.getElementById("editProfileModal").classList.remove("flex");
-
-          // Show success message
+          // show success message
           const successMessage = document.createElement("div");
           successMessage.className =
             "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg";
           successMessage.textContent = "Profile updated successfully";
           document.body.appendChild(successMessage);
-
-          // Remove success message after 3 seconds
+          // remove success message after 3 seconds
           setTimeout(() => {
             successMessage.remove();
           }, 3000);
@@ -471,21 +478,20 @@ endblock %} {% block content %}
         }
       } catch (error) {
         console.error("Error updating profile:", error);
-        // Show error message
+        // show error message
         const errorMessage = document.createElement("div");
         errorMessage.className =
           "fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded shadow-lg";
         errorMessage.textContent = error.message;
         document.body.appendChild(errorMessage);
-
-        // Remove error message after 3 seconds
+        // remove error message after 3 seconds
         setTimeout(() => {
           errorMessage.remove();
         }, 3000);
       }
     });
 
-  // Handle account deletion
+  // handle account deletion
   confirmDeleteBtn.addEventListener("click", async () => {
     if (
       confirm(

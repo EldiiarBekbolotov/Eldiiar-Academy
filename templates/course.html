@@ -1,6 +1,8 @@
 {% extends "base.html" %} {% block title %}{{ course.title }} | Eldiiar
 Academy{% endblock %} {% block content %}
+<!-- main container for course details -->
 <div class="container mx-auto px-4 py-8">
+  <!-- course header with title, description, and stats -->
   <div class="mb-8">
     <h1 class="text-3xl font-bold mb-2">{{ course.title }}</h1>
     <p class="text-gray-600">{{ course.description }}</p>
@@ -12,6 +14,7 @@ Academy{% endblock %} {% block content %}
     </div>
   </div>
 
+  <!-- admin button to add new unit -->
   {% if user and user.is_admin %}
   <div class="mb-8">
     <button
@@ -23,11 +26,14 @@ Academy{% endblock %} {% block content %}
   </div>
   {% endif %}
 
+  <!-- units and lessons list -->
   <div class="space-y-8">
     {% for unit in units %}
     <div class="bg-white rounded-lg shadow p-6">
+      <!-- unit title -->
       <h2 class="text-2xl font-semibold mb-4">{{ unit.title }}</h2>
 
+      <!-- admin button to add lesson to unit -->
       {% if user and user.is_admin %}
       <div class="mb-4">
         <button
@@ -39,6 +45,7 @@ Academy{% endblock %} {% block content %}
       </div>
       {% endif %}
 
+      <!-- lessons within unit -->
       <div class="space-y-4">
         {% for lesson in unit.lessons %}
         <div
@@ -52,10 +59,10 @@ Academy{% endblock %} {% block content %}
                   >{{ lesson.lesson_type|title }}</span
                 >
                 {% if lesson.completed %}
-                <span class="text-sm text-green-600"
-                  ><span class="material-symbols-outlined">task_alt</span>
-                  Completed</span
-                >
+                <span class="text-sm text-green-600">
+                  <span class="material-symbols-outlined">task_alt</span>
+                  Completed
+                </span>
                 {% endif %}
               </div>
             </div>
@@ -72,7 +79,7 @@ Academy{% endblock %} {% block content %}
     {% endfor %}
   </div>
 
-  <!-- Create Unit Modal -->
+  <!-- create unit modal for admins -->
   {% if user and user.is_admin %}
   <div
     id="createUnitModal"
@@ -81,6 +88,7 @@ Academy{% endblock %} {% block content %}
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
       <h2 class="text-2xl font-bold mb-4">Create New Unit</h2>
       <form id="createUnitForm" onsubmit="createUnit(event)">
+        <!-- unit title input -->
         <div class="mb-4">
           <label class="block text-gray-700 mb-2" for="unitTitle"
             >Unit Title</label
@@ -93,6 +101,7 @@ Academy{% endblock %} {% block content %}
             class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
+        <!-- form action buttons -->
         <div class="flex justify-end gap-4">
           <button
             type="button"
@@ -112,7 +121,7 @@ Academy{% endblock %} {% block content %}
     </div>
   </div>
 
-  <!-- Create Lesson Modal -->
+  <!-- create lesson modal for admins -->
   <div
     id="createLessonModal"
     class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center"
@@ -121,6 +130,7 @@ Academy{% endblock %} {% block content %}
       <h2 class="text-2xl font-bold mb-4">Create New Lesson</h2>
       <form id="createLessonForm" onsubmit="createLesson(event)">
         <input type="hidden" id="lessonUnitId" name="unit_id" />
+        <!-- lesson title input -->
         <div class="mb-4">
           <label class="block text-gray-700 mb-2" for="lessonTitle"
             >Lesson Title</label
@@ -133,6 +143,7 @@ Academy{% endblock %} {% block content %}
             class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
+        <!-- lesson type selection -->
         <div class="mb-4">
           <label class="block text-gray-700 mb-2" for="lessonType"
             >Lesson Type</label
@@ -149,6 +160,7 @@ Academy{% endblock %} {% block content %}
             <option value="quiz">Quiz Lesson</option>
           </select>
         </div>
+        <!-- text lesson content input -->
         <div id="textContent" class="mb-4">
           <label class="block text-gray-700 mb-2" for="lessonContent"
             >Content</label
@@ -160,6 +172,7 @@ Academy{% endblock %} {% block content %}
             class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
           ></textarea>
         </div>
+        <!-- video lesson URL input -->
         <div id="videoContent" class="mb-4 hidden">
           <label class="block text-gray-700 mb-2" for="videoUrl"
             >YouTube Video URL</label
@@ -172,6 +185,7 @@ Academy{% endblock %} {% block content %}
             placeholder="https://www.youtube.com/watch?v=..."
           />
         </div>
+        <!-- quiz lesson JSON input -->
         <div id="quizContent" class="mb-4 hidden">
           <label class="block text-gray-700 mb-2" for="quizData"
             >Quiz Data (JSON)</label
@@ -184,6 +198,7 @@ Academy{% endblock %} {% block content %}
             placeholder='{"questions": [{"question": "Question 1", "options": ["A", "B", "C"], "correct": 0}]}'
           ></textarea>
         </div>
+        <!-- form action buttons -->
         <div class="flex justify-end gap-4">
           <button
             type="button"
@@ -205,7 +220,9 @@ Academy{% endblock %} {% block content %}
   {% endif %}
 </div>
 
+<!-- javascript for modal and form handling -->
 <script>
+  // show modal with optional unit ID
   function showModal(modalId, unitId = null) {
     document.getElementById(modalId).classList.remove("hidden");
     if (unitId) {
@@ -213,10 +230,12 @@ Academy{% endblock %} {% block content %}
     }
   }
 
+  // hide modal
   function hideModal(modalId) {
     document.getElementById(modalId).classList.add("hidden");
   }
 
+  // toggle lesson input fields based on type
   function toggleLessonFields() {
     const lessonType = document.getElementById("lessonType").value;
     document
@@ -230,6 +249,7 @@ Academy{% endblock %} {% block content %}
       .classList.toggle("hidden", lessonType !== "quiz");
   }
 
+  // handle unit creation
   async function createUnit(event) {
     event.preventDefault();
     const form = event.target;
@@ -256,13 +276,14 @@ Academy{% endblock %} {% block content %}
     }
   }
 
+  // handle lesson creation
   async function createLesson(event) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    // Parse quiz data if it's a quiz lesson
+    // parse quiz data for quiz lessons
     if (data.lesson_type === "quiz") {
       try {
         data.quiz_data = JSON.parse(data.quiz_data);

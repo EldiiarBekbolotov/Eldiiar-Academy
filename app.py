@@ -1,4 +1,12 @@
+"""
+Copyright (C) Eldiiar Bekbolotov, 2025
+"""
+
+# load environment variables
 import os
+from dotenv import load_dotenv
+
+# flask core
 from flask import (
     Flask,
     render_template,
@@ -9,15 +17,23 @@ from flask import (
     url_for,
     flash,
 )
-from dotenv import load_dotenv
+
+# supabase client
 from supabase import create_client, Client
-import time
+
+# database tools
 import psycopg2
 import psycopg2.extras
+
+# time and date handling
+import time
 from datetime import datetime
 import pytz
+
+# utilities
 import re
 import json
+
 
 # Load environment variables
 load_dotenv()

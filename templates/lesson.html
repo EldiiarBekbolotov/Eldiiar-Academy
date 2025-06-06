@@ -3,14 +3,15 @@
 {% block title %}{{ lesson.title }} | {{ course.title }}{% endblock %}
 
 {% block content %}
+<!-- main container for lesson content -->
 <div class="container mx-auto px-4 py-8">
-    <!-- Breadcrumb -->
+    <!-- breadcrumb navigation -->
     <nav class="text-sm mb-4 overflow-x-auto">
         <ol class="list-none p-0 inline-flex whitespace-nowrap">
             <li class="flex items-center">
                 <a href="/browse_courses" class="text-blue-600 hover:text-blue-800">Courses</a>
                 <svg class="fill-current w-3 h-3 mx-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
-                    <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/>
+                    <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c-9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/>
                 </svg>
             </li>
             <li class="flex items-center">
@@ -29,8 +30,9 @@
         </ol>
     </nav>
 
+    <!-- main layout with navigation and content -->
     <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Navigation Rail -->
+        <!-- navigation rail -->
         <div class="w-full lg:w-64 flex-shrink-0">
             <div class="bg-white rounded-lg shadow-md p-4">
                 <h3 class="font-semibold text-lg mb-4">{{ course.title }}</h3>
@@ -41,7 +43,7 @@
                         <ul class="space-y-1">
                             {% for l in lessons if l.unit_id == u.id %}
                             <li>
-                                <a href="/lesson/{{ l.id }}" 
+                                <a href="/lesson/{{ l.id }}"
                                    class="block px-3 py-2 rounded {% if l.id == lesson.id %}bg-blue-100 text-blue-700{% else %}hover:bg-gray-100{% endif %}">
                                     {{ l.title }}
                                     {% if l.completed %}
@@ -57,9 +59,9 @@
             </div>
         </div>
 
-        <!-- Main Content -->
+        <!-- main content area -->
         <div class="flex-grow">
-            <!-- Lesson Header -->
+            <!-- lesson header -->
             <div class="bg-white rounded-lg shadow-md p-4 lg:p-6 mb-6">
                 <div class="flex flex-col lg:flex-row justify-between items-start gap-4">
                     <div>
@@ -72,6 +74,7 @@
                         </div>
                     </div>
                     {% if user and user.is_admin %}
+                    <!-- admin action buttons -->
                     <div class="flex space-x-2">
                         <button onclick="showEditModal()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                             Edit Lesson
@@ -84,56 +87,57 @@
                 </div>
             </div>
 
-            <!-- Lesson Content -->
+            <!-- lesson content -->
             <div class="bg-white rounded-lg shadow p-4 lg:p-6 mb-8">
                 <div class="prose max-w-none">
                     {% if lesson.lesson_type == 'text' %}
-                        {{ lesson.content|safe }}
+                    <!-- text lesson content -->
+                    {{ lesson.content|safe }}
                     {% elif lesson.lesson_type == 'video' %}
-                        <div class="aspect-w-16 aspect-h-9 mb-4">
-                            <iframe
-                                src="https://www.youtube.com/embed/{{ lesson.video_url|youtube_id }}"
-                                frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen
-                                class="w-full h-[400px] rounded-lg"
-                            ></iframe>
-                        </div>
+                    <!-- video lesson content -->
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <iframe
+                            src="https://www.youtube.com/embed/{{ lesson.video_url|youtube_id }}"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                            class="w-full h-[400px] rounded-lg"
+                        ></iframe>
+                    </div>
                     {% elif lesson.lesson_type == 'quiz' %}
-                        <div id="quiz-container" class="space-y-4">
-                            <!-- Quiz will be loaded here -->
-                        </div>
+                    <!-- quiz lesson content -->
+                    <div id="quiz-container" class="space-y-4">
+                        <!-- quiz will be loaded here -->
+                    </div>
                     {% endif %}
                 </div>
-                
-                <!-- Mark as Complete Button -->
+
+                <!-- mark as complete button -->
                 {% if user and not lesson.completed %}
                 <div class="mt-6 flex justify-end">
                     <button
                         onclick="markLessonComplete()"
                         class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2"
                     >
-                        Mark as Complete 
+                        Mark as Complete
                         <span class="material-symbols-outlined">task_alt</span>
                     </button>
                 </div>
                 {% elif lesson.completed %}
                 <div class="mt-6 flex justify-end">
                     <div class="bg-green-100 text-green-800 px-6 py-2 rounded-lg flex items-center space-x-2">
-                        
                         Completed <span class="material-symbols-outlined">task_alt</span>
                     </div>
                 </div>
                 {% endif %}
             </div>
 
-            <!-- Comments Section -->
+            <!-- comments section -->
             <div class="bg-white rounded-lg shadow p-4 lg:p-6">
                 <h3 class="text-xl font-semibold mb-4">Discussion</h3>
-              
-                
+
                 {% if user %}
-                <!-- Comment Form -->
+                <!-- comment form -->
                 <div class="bg-blue-50 p-4 rounded-lg mb-6">
                     <h4 class="font-bold mb-2">Comment Form:</h4>
                     <form id="commentForm" class="mb-6">
@@ -156,6 +160,7 @@
                     </form>
                 </div>
                 {% else %}
+                <!-- login prompt -->
                 <div class="bg-gray-50 rounded-lg p-4 mb-6">
                     <p class="text-gray-600">
                         Please <a href="{{ url_for('login') }}" class="text-blue-600 hover:underline">log in</a> to join the discussion.
@@ -163,7 +168,7 @@
                 </div>
                 {% endif %}
 
-                <!-- Comments List -->
+                <!-- comments list -->
                 <div id="commentsList" class="space-y-6">
                     {% for comment in comments %}
                     <div class="comment border-b pb-4" data-comment-id="{{ comment.id }}">
@@ -185,8 +190,8 @@
                                     {% endif %}
                                 </div>
                                 <p class="mt-1 text-gray-700">{{ comment.content }}</p>
-                                
-                                <!-- Reply Form -->
+
+                                <!-- reply form -->
                                 {% if user %}
                                 <div class="mt-2">
                                     <button type="button" class="text-blue-600 hover:text-blue-800 text-sm reply-btn">
@@ -211,7 +216,7 @@
                                 </div>
                                 {% endif %}
 
-                                <!-- Replies -->
+                                <!-- replies list -->
                                 {% if comment.replies %}
                                 <div class="mt-4 space-y-4">
                                     {% for reply in comment.replies %}
@@ -250,17 +255,19 @@
     </div>
 </div>
 
-<!-- Edit Lesson Modal -->
+<!-- edit lesson modal -->
 {% if user and user.is_admin %}
 <div id="edit-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
     <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Edit Lesson</h3>
             <form id="edit-form" class="space-y-4">
+                <!-- title input -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Title</label>
                     <input type="text" id="edit-title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ lesson.title }}" required>
                 </div>
+                <!-- lesson type selection -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Lesson Type</label>
                     <select id="edit-lesson-type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
@@ -269,18 +276,22 @@
                         <option value="quiz" {% if lesson.lesson_type == 'quiz' %}selected{% endif %}>Quiz</option>
                     </select>
                 </div>
+                <!-- text content input -->
                 <div id="edit-content-container">
                     <label class="block text-sm font-medium text-gray-700">Content</label>
                     <textarea id="edit-content" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" rows="4">{{ lesson.content }}</textarea>
                 </div>
+                <!-- video url input -->
                 <div id="edit-video-container" class="hidden">
                     <label class="block text-sm font-medium text-gray-700">Video URL</label>
                     <input type="url" id="edit-video-url" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ lesson.video_url }}">
                 </div>
+                <!-- quiz data input -->
                 <div id="edit-quiz-container" class="hidden">
                     <label class="block text-sm font-medium text-gray-700">Quiz Data (JSON)</label>
                     <textarea id="edit-quiz-data" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" rows="4">{{ lesson.quiz_data|tojson(indent=2) }}</textarea>
                 </div>
+                <!-- form action buttons -->
                 <div class="flex justify-end space-x-2">
                     <button type="button" onclick="hideEditModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
                         Cancel
@@ -295,20 +306,22 @@
 </div>
 {% endif %}
 
+<!-- javascript for lesson functionality -->
 <script>
 let lessonId = "{{ lesson.id }}";
 let lessonType = "{{ lesson.lesson_type }}";
 
-// Show/hide edit modal
+// show edit modal
 function showEditModal() {
     document.getElementById('edit-modal').classList.remove('hidden');
 }
 
+// hide edit modal
 function hideEditModal() {
     document.getElementById('edit-modal').classList.add('hidden');
 }
 
-// Handle lesson type change in edit form
+// toggle lesson type fields in edit form
 document.getElementById('edit-lesson-type').addEventListener('change', function(e) {
     const type = e.target.value;
     document.getElementById('edit-content-container').classList.toggle('hidden', type === 'video');
@@ -316,7 +329,7 @@ document.getElementById('edit-lesson-type').addEventListener('change', function(
     document.getElementById('edit-quiz-container').classList.toggle('hidden', type !== 'quiz');
 });
 
-// Handle edit form submission
+// handle edit form submission
 document.getElementById('edit-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -359,7 +372,7 @@ document.getElementById('edit-form').addEventListener('submit', async function(e
     }
 });
 
-// Confirm and handle lesson deletion
+// confirm and handle lesson deletion
 function confirmDelete() {
     if (confirm('Are you sure you want to delete this lesson? This action cannot be undone.')) {
         deleteLesson();
@@ -384,7 +397,7 @@ async function deleteLesson() {
     }
 }
 
-// Load and display quiz if lesson type is quiz
+// load and display quiz for quiz lessons
 async function loadQuiz() {
     if (lessonType === 'quiz') {
         try {
@@ -422,7 +435,7 @@ async function loadQuiz() {
     }
 }
 
-// Submit quiz answers
+// submit quiz answers
 async function submitQuiz() {
     const answers = [];
     const questions = document.querySelectorAll('[id^="q"]');
@@ -466,7 +479,7 @@ async function submitQuiz() {
     }
 }
 
-// Initialize
+// initialize page
 document.addEventListener('DOMContentLoaded', function() {
     if (lessonType === 'quiz') {
         loadQuiz();
@@ -474,7 +487,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const commentForm = document.getElementById('commentForm');
 
-    // Handle comment submission
+    // handle comment submission
     if (commentForm) {
         commentForm.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -502,10 +515,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error(data.error || 'Failed to post comment');
                 }
 
-                // Clear the form
+                // clear the form
                 document.getElementById('commentContent').value = '';
                 
-                // Create new comment element
+                // create new comment element
                 const commentsList = document.getElementById('commentsList');
                 const newComment = document.createElement('div');
                 newComment.className = 'comment border-b pb-4';
@@ -529,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                             <p class="mt-1 text-gray-700">${content}</p>
                             
-                            <!-- Reply Form -->
+                            <!-- reply form -->
                             <div class="mt-2">
                                 <button type="button" class="text-blue-600 hover:text-blue-800 text-sm reply-btn">
                                     Reply
@@ -555,10 +568,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 `;
                 
-                // Add the new comment to the top of the list
+                // add new comment to the top
                 commentsList.insertBefore(newComment, commentsList.firstChild);
                 
-                // Add event listeners to the new comment
+                // add event listeners to new comment
                 setupCommentEventListeners(newComment);
                 
             } catch (error) {
@@ -567,9 +580,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Function to setup event listeners for a comment
+    // setup event listeners for comments
     function setupCommentEventListeners(commentElement) {
-        // Reply button
+        // reply button
         const replyBtn = commentElement.querySelector('.reply-btn');
         if (replyBtn) {
             replyBtn.addEventListener('click', () => {
@@ -579,7 +592,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Cancel reply button
+        // cancel reply button
         const cancelBtn = commentElement.querySelector('.cancel-reply');
         if (cancelBtn) {
             cancelBtn.addEventListener('click', () => {
@@ -589,7 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Reply form submission
+        // reply form submission
         const submitReplyBtn = commentElement.querySelector('.submit-reply');
         if (submitReplyBtn) {
             submitReplyBtn.addEventListener('click', async () => {
@@ -620,11 +633,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         throw new Error(data.error || 'Failed to post reply');
                     }
 
-                    // Clear and hide the form
+                    // clear and hide form
                     replyForm.querySelector('textarea').value = '';
                     replyForm.classList.add('hidden');
 
-                    // Reload the page to show the new reply
+                    // reload to show new reply
                     location.reload();
                 } catch (error) {
                     console.error('Error posting reply:', error);
@@ -633,7 +646,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Delete button
+        // delete button
         const deleteBtn = commentElement.querySelector('.delete-comment');
         if (deleteBtn) {
             deleteBtn.addEventListener('click', async () => {
@@ -656,7 +669,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         throw new Error(data.error || 'Failed to delete comment');
                     }
 
-                    // Remove the comment from the DOM
+                    // remove comment from DOM
                     commentElement.remove();
                 } catch (error) {
                     console.error('Error deleting comment:', error);
@@ -666,11 +679,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Setup event listeners for existing comments
+    // setup event listeners for existing comments
     document.querySelectorAll('.comment').forEach(setupCommentEventListeners);
 });
 
-// Mark lesson as complete
+// mark lesson as complete
 async function markLessonComplete() {
     try {
         const response = await fetch(`/api/lesson/${lessonId}`, {

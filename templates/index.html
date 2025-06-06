@@ -1,18 +1,23 @@
-{% extends 'base.html' %} {% block title %}Home | Eldiiar Academy{% endblock %}
+{% extends "base.html" %} {% block title %}Home | Eldiiar Academy{% endblock %}
 {% block content %}
+<!-- hero section -->
 <section class="text-center py-16">
+  <!-- main heading -->
   <h1 class="text-4xl font-extrabold text-blue-700 mb-4">
     Learn. Share. Grow.
   </h1>
+  <!-- introductory text -->
   <p class="text-lg text-gray-700 mb-8">
     Welcome to Eldiiar Academy, a free platform for learning, sharing, and
     growing together.
   </p>
+  <!-- browse courses button -->
   <a
     href="/browse_courses"
     class="bg-primary-600 text-white px-6 py-3 rounded-lg shadow hover:bg-primary-800 active:bg-primary-600 transition"
-    >Browse Courses
-    <span class="material-symbols-outlined"> arrow_forward </span></a
   >
+    Browse Courses
+    <span class="material-symbols-outlined">arrow_forward</span>
+  </a>
 </section>
 {% endblock %}

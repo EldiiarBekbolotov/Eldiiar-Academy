@@ -2,22 +2,51 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- set charset and viewport for responsive design -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- page title, can be overridden by child templates -->
     <title>{% block title %}Eldiiar Academy{% endblock %}</title>
 
-    <!-- Google Fonts -->
+    <!-- google fonts preload and stylesheet -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
       rel="stylesheet"
     />
+
+    <!-- custom css file -->
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
     />
-    <!-- Tailwind CSS -->
+
+    <!-- favicons -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{{ url_for('static', filename='apple-touch-icon.png') }}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="{{ url_for('static', filename='favicon-32x32.png') }}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="{{ url_for('static', filename='favicon-16x16.png') }}"
+    />
+    <link
+      rel="manifest"
+      href="{{ url_for('static', filename='site.webmanifest') }}"
+    />
+
+    <!-- tailwind config with custom settings -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -76,9 +105,9 @@
                   maxWidth: "none",
                   color: "#333",
                   a: {
-                    color: "#8b5cf6", // matching primary.500
+                    color: "#8b5cf6",
                     "&:hover": {
-                      color: "#7c3aed", // matching primary.600
+                      color: "#7c3aed",
                     },
                   },
                   h1: {
@@ -99,22 +128,25 @@
     </script>
   </head>
   <body class="bg-gray-50 min-h-screen">
+    <!-- site navbar -->
     <nav class="bg-white shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
           <div class="flex">
+            <!-- site logo -->
             <div class="flex-shrink-0 flex items-center">
-              <a href="/" class="text-2xl font-bold text-primary-600"
-                ><i class="material-symbols-outlined">editor_choice</i> Eldiiar
-                Academy</a
-              >
+              <a href="/" class="text-2xl font-bold text-primary-600">
+                <i class="material-symbols-outlined">editor_choice</i> Eldiiar
+                Academy
+              </a>
             </div>
+            <!-- nav links for desktop -->
             <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
               <a
                 href="/browse_courses"
                 class="border-transparent text-gray-500 hover:border-primary-500 hover:text-primary-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
-                <span class="material-symbols-outlined mr-1"> school</span>
+                <span class="material-symbols-outlined mr-1">school</span>
                 Courses
               </a>
               {% if session.get('user_id') %}
@@ -122,20 +154,20 @@
                 href="/dashboard"
                 class="border-transparent text-gray-500 hover:border-primary-500 hover:text-primary-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
-                <span class="material-symbols-outlined mr-1"> person </span>
+                <span class="material-symbols-outlined mr-1">person</span>
                 Dashboard
               </a>
               {% endif %}
             </div>
           </div>
+          <!-- desktop user options -->
           <div class="hidden sm:ml-6 sm:flex sm:items-center">
             {% if session.get('user_id') %}
             <div class="ml-3 relative">
               <div class="flex items-center space-x-4">
-                <a href="/logout" class="text-gray-500 hover:text-primary-700"
-                  ><span class="material-symbols-outlined"> logout </span>
-                  Logout</a
-                >
+                <a href="/logout" class="text-gray-500 hover:text-primary-700">
+                  <span class="material-symbols-outlined">logout</span> Logout
+                </a>
               </div>
             </div>
             {% else %}
@@ -151,8 +183,7 @@
             </div>
             {% endif %}
           </div>
-
-          <!-- Mobile menu button -->
+          <!-- mobile toggle -->
           <div class="flex items-center sm:hidden">
             <button
               type="button"
@@ -161,7 +192,7 @@
               aria-expanded="false"
             >
               <span class="sr-only">Open main menu</span>
-              <!-- Icon when menu is closed -->
+              <!-- hamburger icon -->
               <svg
                 class="block h-6 w-6"
                 xmlns="http://www.w3.org/2000/svg"
@@ -177,7 +208,7 @@
                   d="M4 6h16M4 12h16M4 18h16"
                 />
               </svg>
-              <!-- Icon when menu is open -->
+              <!-- close icon -->
               <svg
                 class="hidden h-6 w-6"
                 xmlns="http://www.w3.org/2000/svg"
@@ -197,8 +228,7 @@
           </div>
         </div>
       </div>
-
-      <!-- Mobile menu, show/hide based on menu state -->
+      <!-- mobile menu dropdown -->
       <div class="sm:hidden hidden" id="mobile-menu">
         <div class="pt-2 pb-3 space-y-1">
           <a
@@ -212,19 +242,18 @@
             href="/dashboard"
             class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
           >
-            <span class="material-symbols-outlined"> person </span> Dashboard
+            <span class="material-symbols-outlined">person</span> Dashboard
           </a>
           {% endif %}
         </div>
         <div class="pt-4 pb-3 border-t border-gray-200">
           {% if session.get('user_id') %}
-
           <div class="mt-3 space-y-1">
             <a
               href="/logout"
               class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
             >
-              <span class="material-symbols-outlined"> logout </span> Logout
+              <span class="material-symbols-outlined">logout</span> Logout
             </a>
           </div>
           {% else %}
@@ -232,22 +261,20 @@
             <a
               href="/login"
               class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+              >Login</a
             >
-              Login
-            </a>
             <a
               href="/signup"
               class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+              >Sign Up</a
             >
-              Sign Up
-            </a>
           </div>
           {% endif %}
         </div>
       </div>
     </nav>
 
-    <!-- Flash Messages -->
+    <!-- flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %} {% if
     messages %} {% for category, message in messages %}
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
@@ -259,11 +286,12 @@
     </div>
     {% endfor %} {% endif %} {% endwith %}
 
+    <!-- main page content -->
     <main class="container mx-auto px-4">
       {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
+    <!-- footer content -->
     <footer class="bg-white border-t mt-12">
       <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -326,32 +354,20 @@
         </div>
         <div class="mt-8 pt-8 border-t border-gray-200">
           <p class="text-center text-gray-500 text-sm">
-            © {{ now.strftime('%Y') }} Eldiiar Bekbolotov
+            © {{ now.strftime('%Y') }} Eldiiar Bekbolotov. This is a
+            demonstration.
+            <a
+              href="https://github.com/EldiiarBekbolotov/Eldiiar-Academy"
+              target="_blank"
+              class="text-primary-500 hover:text-primary-600"
+              >Star on GitHub</a
+            >
           </p>
         </div>
       </div>
     </footer>
 
+    <!-- custom js -->
     <script src="{{ url_for('static', filename='main.js') }}"></script>
-    <script>
-      // Mobile menu toggle
-      document.addEventListener("DOMContentLoaded", function () {
-        const mobileMenuButton = document.querySelector(".mobile-menu-button");
-        const mobileMenu = document.querySelector("#mobile-menu");
-        const menuIcon = mobileMenuButton.querySelector(".block");
-        const closeIcon = mobileMenuButton.querySelector(".hidden");
-
-        if (mobileMenuButton && mobileMenu) {
-          mobileMenuButton.addEventListener("click", function () {
-            mobileMenu.classList.toggle("hidden");
-            menuIcon.classList.toggle("hidden");
-            closeIcon.classList.toggle("hidden");
-            const isExpanded =
-              mobileMenuButton.getAttribute("aria-expanded") === "true";
-            mobileMenuButton.setAttribute("aria-expanded", !isExpanded);
-          });
-        }
-      });
-    </script>
   </body>
 </html>

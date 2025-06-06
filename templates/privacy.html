@@ -1,13 +1,17 @@
 {% extends "base.html" %} {% block title %}Privacy Policy - Eldiiar Academy{%
 endblock %} {% block content %}
+<!-- main container for privacy policy content -->
 <div class="max-w-4xl mx-auto py-8">
+  <!-- page title -->
   <h1 class="text-3xl font-bold text-gray-900 mb-8">Privacy Policy</h1>
 
   <div class="prose prose-lg">
+    <!-- last updated date -->
     <p class="text-gray-600 mb-6">
       Last updated: {{ now.strftime('%B %d, %Y') }}
     </p>
 
+    <!-- information collection section -->
     <section class="mb-8">
       <h2 class="text-2xl font-semibold text-gray-900 mb-4">
         1. Information We Collect
@@ -23,6 +27,7 @@ endblock %} {% block content %}
       </ul>
     </section>
 
+    <!-- information usage section -->
     <section class="mb-8">
       <h2 class="text-2xl font-semibold text-gray-900 mb-4">
         2. How We Use Your Information
@@ -35,6 +40,7 @@ endblock %} {% block content %}
       </ul>
     </section>
 
+    <!-- information sharing section -->
     <section class="mb-8">
       <h2 class="text-2xl font-semibold text-gray-900 mb-4">
         3. Information Sharing
@@ -44,6 +50,7 @@ endblock %} {% block content %}
       </p>
     </section>
 
+    <!-- data security section -->
     <section class="mb-8">
       <h2 class="text-2xl font-semibold text-gray-900 mb-4">
         4. Data Security
@@ -55,6 +62,7 @@ endblock %} {% block content %}
       </p>
     </section>
 
+    <!-- user rights section -->
     <section class="mb-8">
       <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Your Rights</h2>
       <p class="text-gray-600 mb-4">You have the right to:</p>
@@ -64,6 +72,7 @@ endblock %} {% block content %}
       </ul>
     </section>
 
+    <!-- commented out contact section -->
     <!--<section class="mb-8">
       <h2 class="text-2xl font-semibold text-gray-900 mb-4">6. Contact Us</h2>
       <p class="text-gray-600 mb-4">

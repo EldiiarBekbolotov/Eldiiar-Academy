@@ -1,4 +1,4 @@
-How to run the program using the terminal:
+_How to run the program using the terminal:_
 
 <pre><code>
 bash python -m venv/venv # if this doesn't work, python -m venv/venv
@@ -9,18 +9,20 @@ pip install -r requirements.txt
 
 Create a `.env` file in the root directory with your Supabase credentials:
 
-   ```
-   SUPABASE_URL=your_supabase_url
-   SUPABASE_KEY=your_supabase_key
-   SUPABASE_DB_NAME=your_db_name
-   SUPABASE_DB_USER=your_db_user
-   SUPABASE_DB_PASSWORD=your_db_password
-   SUPABASE_DB_HOST=your_db_host
-   SUPABASE_DB_PORT=5432
-   FLASK_SECRET_KEY=your_secret_key
-   ```
+```
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+SUPABASE_DB_NAME=your_db_name
+SUPABASE_DB_USER=your_db_user
+SUPABASE_DB_PASSWORD=your_db_password
+SUPABASE_DB_HOST=your_db_host
+SUPABASE_DB_PORT=5432
+FLASK_SECRET_KEY=your_secret_key
+```
 
 Finally, run the program:
-```flask run```
+`flask run`
 if you want auto reloading on code changes, use:
-```flask --app app.py --debug run```
+`flask --app app.py --debug run`
+or
+`python app.py`

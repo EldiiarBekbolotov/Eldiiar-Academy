@@ -2,6 +2,7 @@
 {% block content %}
 
 <style>
+  /* fixed loading bar for visual effect */
   #loading-bar {
     position: fixed;
     top: 0;
@@ -14,11 +15,15 @@
   }
 </style>
 
+<!-- loading bar element -->
 <div id="loading-bar"></div>
 
+<!-- blog list section -->
 <div id="scene-list" class="max-w-4xl mx-auto px-4 py-8">
+  <!-- blog page title -->
   <h1 class="text-3xl font-bold text-gray-900 mb-6">Blog</h1>
 
+  <!-- informational banner -->
   <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8">
     <div class="flex">
       <div class="flex-shrink-0">
@@ -34,53 +39,61 @@
     </div>
   </div>
 
+  <!-- container for blog cards -->
   <div id="blog-container" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
 </div>
 
+<!-- blog detail section -->
 <div id="scene-detail" class="max-w-3xl mx-auto px-4 py-8 hidden">
+  <!-- back to blog list button -->
   <button
     onclick="switchScene('list')"
     class="mb-4 text-blue-600 hover:underline"
   >
-    &larr; Back to Blog
+    ← Back to Blog
   </button>
+  <!-- blog title placeholder -->
   <h2 id="blog-title" class="text-2xl font-bold mb-2"></h2>
+  <!-- blog metadata placeholder -->
   <div class="text-sm text-gray-500 mb-4" id="blog-meta"></div>
+  <!-- blog content placeholder -->
   <div id="blog-content" class="text-gray-700"></div>
 </div>
 
+<!-- javascript for blog functionality -->
 <script>
+  // sample blog data
   const blogData = [
     {
       id: 1,
-      title: "Coming Soon: Learning Tips",
+      title: "Coming soon: ~- Learning_Tips -~",
       author: "Eldiiar Bekbolotov [Admin]",
       posted: "2025-06-01",
       updated: "2025-06-02",
       excerpt:
-        "Stay tuned for our upcoming series on effective learning strategies...",
+        "Stay tuned for our upcoming series, ~- Learning_Tips -~ which dives in to...",
       content:
-        "Learning isn’t just about time spent, it’s about method.<br>Spaced repetition beats cramming every time.<br>Use active recall rather than passive review.<br>Set goals for each study session, no matter how small.<br>Minimize distractions to improve retention.<br>Celebrate small wins to stay motivated.",
+        "Sample blog post lorem ipsum doler sit amet sunta qulpa si. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
     },
     {
       id: 3,
-      title: "Micro Habits that Make Macro Results",
+      title: "Microhabit, Macroresult",
       author: "Eldiiar Bekbolotov [Admin]",
       posted: "2025-05-15",
       updated: "2025-05-20",
       excerpt: "Tiny consistent actions can lead to huge results...",
       content:
-        "Start your day by writing one thing you're grateful for.<br>Review your calendar every morning before you begin.<br>Read one page of a book instead of aiming for a chapter.<br>Take 5 deep breaths before reacting to stress.<br>Place your phone out of reach when focusing.<br>Small wins snowball. Stay consistent.",
+        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
     },
     {
       id: 4,
-      title: "How to Never Forget What You Learn",
+      title: "How to NEVER forget what you learn",
       author: "Eldiiar Bekbolotov [Admin]",
       posted: "2025-04-29",
       updated: "2025-05-01",
       excerpt: "Forget forgetting, here's how to remember anything longer...",
       content:
-        "Teach what you learn to someone else within 24 hours.<br>Use images and weird stories to encode dry facts.<br>Spaced repetition makes memory stick long term.<br>Quiz yourself often, don’t just reread.<br>Chunk related info together to reduce overload.<br>Use apps like Anki or simple flashcards.",
+        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
     },
     {
       id: 5,
@@ -90,7 +103,7 @@
       updated: "2025-04-12",
       excerpt: "Clear the digital noise and unlock better focus...",
       content:
-        "Turn off non-critical app notifications today.<br>Use browser extensions to block distracting sites.<br>Organize your files into clear learning folders.<br>Unsubscribe from newsletters you don’t read.<br>Batch-check emails twice a day, not all day.<br>Decluttering your tech declutters your mind.",
+        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
     },
     {
       id: 6,
@@ -100,39 +113,62 @@
       updated: "2025-03-23",
       excerpt: "Feeling overwhelmed? Try this simple reset...",
       content:
-        "Close your eyes and breathe in deeply for four counts.<br>Hold your breath for four. Then out slowly for four.<br>Bring your attention to what you hear, feel, smell.<br>Let go of judgment. Just notice your breath.<br>Use this before tests, study sessions, or public speaking.<br>One mindful minute beats hours of burnout.",
+        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
     },
   ];
 
+  /**
+   * Populate blog cards dynamically and append them to the container.
+   */
   const container = document.getElementById("blog-container");
   blogData.forEach((blog) => {
     const card = document.createElement("div");
     card.className =
       "bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition";
+
     card.innerHTML = `
-      <div class="p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-2">${blog.title}</h2>
-        <p class="text-gray-600 mb-4">${blog.excerpt}</p>
-        <div class="text-sm text-gray-500">By ${blog.author}, ${blog.posted}</div>
-      </div>
-    `;
+    <div class="p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-2">${blog.title}</h2>
+      <p class="text-gray-600 mb-4">${blog.excerpt}</p>
+      <div class="text-sm text-gray-500">By ${blog.author}, ${blog.posted}</div>
+    </div>
+  `;
+
+    // bind click event to open blog detail view
     card.onclick = () => loadBlog(blog.id);
+
+    // add card to the DOM
     container.appendChild(card);
   });
 
+  /**
+   * Switches between the blog list and detail view.
+   *
+   * @param {string} scene - The scene to show ('list' or 'detail').
+   */
   function switchScene(scene) {
     document.getElementById("scene-list").classList.add("hidden");
     document.getElementById("scene-detail").classList.add("hidden");
     document.getElementById(`scene-${scene}`).classList.remove("hidden");
   }
 
+  /**
+   * Simulates a loading bar animation before running the callback.
+   *
+   * @param {Function} callback - Function to call after loading completes.
+   */
   function fakeLoading(callback) {
     const bar = document.getElementById("loading-bar");
+
     bar.style.display = "block";
     bar.style.width = "0%";
+
+    // simulate load progress
     setTimeout(() => {
       bar.style.width = "100%";
     }, 50);
+
+    // complete and reset loading bar
     setTimeout(() => {
       bar.style.display = "none";
       bar.style.width = "0%";
@@ -140,19 +176,31 @@
     }, 600);
   }
 
+  /**
+   * Loads a blog post into the detail view by its ID.
+   *
+   * @param {number} id - The ID of the blog post to load.
+   */
   function loadBlog(id) {
     fakeLoading(() => {
       const blog = blogData.find((b) => b.id === id);
+
+      // update title and meta info
       document.getElementById("blog-title").innerText = blog.title;
       document.getElementById(
         "blog-meta"
       ).innerText = `By ${blog.author} • Posted: ${blog.posted} • Updated: ${blog.updated}`;
+
+      // render content
       const contentDiv = document.getElementById("blog-content");
       contentDiv.innerHTML = blog.content;
+
+      // switch to detail view
       switchScene("detail");
+
+      // scroll to top for better UX
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     });
   }
 </script>
-
 {% endblock %}

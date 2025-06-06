@@ -1,6 +1,8 @@
-{% extends 'base.html' %} {% block title %}Public Profile | Eldiiar Academy{%
+{% extends "base.html" %} {% block title %}Public Profile | Eldiiar Academy{%
 endblock %} {% block content %}
+<!-- main container for public profile -->
 <div class="max-w-2xl mx-auto bg-white rounded-lg shadow p-8 mt-8">
+  <!-- profile header with avatar and user info -->
   <div class="flex items-center space-x-4 mb-6">
     <div
       class="w-16 h-16 rounded-full bg-blue-200 flex items-center justify-center text-2xl font-bold text-blue-700"
@@ -12,7 +14,9 @@ endblock %} {% block content %}
       <p class="text-gray-500">@handle</p>
     </div>
   </div>
+  <!-- profile bio -->
   <p class="mb-4 text-gray-700">Bio goes here. (max 180 chars)</p>
+  <!-- badges display -->
   <div class="mb-4">
     <span class="font-semibold">Badges:</span>
     <div class="flex space-x-2 mt-2">
@@ -26,6 +30,7 @@ endblock %} {% block content %}
       >
     </div>
   </div>
+  <!-- energy points display -->
   <div>
     <span class="font-semibold">Energy Points:</span>
     <span class="ml-2 text-blue-600 font-bold">123</span>

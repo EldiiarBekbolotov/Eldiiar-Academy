@@ -1,8 +1,12 @@
-{% extends 'base.html' %} {% block title %}Sign Up | Eldiiar Academy{% endblock
+{% extends "base.html" %} {% block title %}Sign Up | Eldiiar Academy{% endblock
 %} {% block content %}
+<!-- main container for signup form -->
 <div class="max-w-md mx-auto bg-white rounded-lg shadow p-8 mt-8">
+  <!-- page title -->
   <h1 class="text-2xl font-bold text-primary-700 mb-6">Sign Up</h1>
+  <!-- signup form -->
   <form id="signupForm" class="space-y-4">
+    <!-- email input -->
     <div>
       <label for="email" class="block text-gray-700">Email</label>
       <input
@@ -13,6 +17,7 @@
         required
       />
     </div>
+    <!-- password input -->
     <div>
       <label for="password" class="block text-gray-700">Password</label>
       <input
@@ -23,6 +28,7 @@
         required
       />
     </div>
+    <!-- username input -->
     <div>
       <label for="username" class="block text-gray-700">Username</label>
       <input
@@ -33,6 +39,7 @@
         required
       />
     </div>
+    <!-- handle input -->
     <div>
       <label for="handle" class="block text-gray-700"
         >Handle (e.g., @username)</label
@@ -45,9 +52,18 @@
         required
       />
     </div>
-    <p> By signing up, you agree to our
-    <a href="/terms" class="text-primary-600 hover:underline">Terms of Service</a> and
-    <a href="/privacy" class="text-primary-600 hover:underline">Privacy Policy</a>.</p>
+    <!-- terms and privacy policy agreement -->
+    <p>
+      By signing up, you agree to our
+      <a href="/terms" class="text-primary-600 hover:underline"
+        >Terms of Service</a
+      >
+      and
+      <a href="/privacy" class="text-primary-600 hover:underline"
+        >Privacy Policy</a
+      >.
+    </p>
+    <!-- submit button -->
     <button
       type="submit"
       class="w-full bg-primary-600 text-white px-4 py-2 rounded hover:bg-primary-700"
@@ -55,12 +71,15 @@
       Sign Up
     </button>
   </form>
+  <!-- login link -->
   <p class="mt-4 text-center text-gray-600">
     Already have an account?
-    <a href="/login" class="text-primary-600 hover:underline">Login</a>. You must confirm your email address before logging in.
+    <a href="/login" class="text-primary-600 hover:underline">Login</a>. You
+    must confirm your email address before logging in.
   </p>
 </div>
 
+<!-- javascript for signup form submission -->
 <script>
   document
     .getElementById("signupForm")

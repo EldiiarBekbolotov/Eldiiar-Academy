@@ -1,7 +1,7 @@
--- Enable Row Level Security
+-- enable row level security on auth.users table
 ALTER TABLE auth.users ENABLE ROW LEVEL SECURITY;
 
--- Create profiles table
+-- create profiles table for user information
 CREATE TABLE profiles (
     id UUID REFERENCES auth.users(id) PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
@@ -14,12 +14,12 @@ CREATE TABLE profiles (
     energy_points INTEGER DEFAULT 0
 );
 
--- RLS for profiles
+-- enable RLS and define policies for profiles table
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public profiles are viewable by everyone" ON profiles FOR SELECT USING (true);
 CREATE POLICY "Users can update their own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
 
--- Create courses table
+-- create courses table for course information
 CREATE TABLE courses (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title TEXT NOT NULL,
@@ -27,11 +27,11 @@ CREATE TABLE courses (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
--- RLS for courses
+-- enable RLS and define policy for courses table
 ALTER TABLE courses ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Courses are viewable by everyone" ON courses FOR SELECT USING (true);
 
--- Create units table
+-- create units table for course units
 CREATE TABLE units (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     course_id UUID REFERENCES courses(id) ON DELETE CASCADE,
@@ -39,11 +39,11 @@ CREATE TABLE units (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
--- RLS for units
+-- enable RLS and define policy for units table
 ALTER TABLE units ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Units are viewable by everyone" ON units FOR SELECT USING (true);
 
--- Create lessons table
+-- create lessons table for lesson content
 CREATE TABLE lessons (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     unit_id UUID REFERENCES units(id) ON DELETE CASCADE,
@@ -52,11 +52,11 @@ CREATE TABLE lessons (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
--- RLS for lessons
+-- enable RLS and define policy for lessons table
 ALTER TABLE lessons ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Lessons are viewable by everyone" ON lessons FOR SELECT USING (true);
 
--- Create lesson_completions table
+-- create lesson_completions table to track completed lessons
 CREATE TABLE lesson_completions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -65,12 +65,12 @@ CREATE TABLE lesson_completions (
     UNIQUE(user_id, lesson_id)
 );
 
--- RLS for lesson_completions
+-- enable RLS and define policies for lesson_completions table
 ALTER TABLE lesson_completions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view their own completions" ON lesson_completions FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert their own completions" ON lesson_completions FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Create comments table
+-- create comments table for lesson discussions
 CREATE TABLE comments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     lesson_id UUID REFERENCES lessons(id) ON DELETE CASCADE,
@@ -81,14 +81,14 @@ CREATE TABLE comments (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
--- RLS for comments
+-- enable RLS and define policies for comments table
 ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Comments are viewable by everyone" ON comments FOR SELECT USING (true);
 CREATE POLICY "Users can insert their own comments" ON comments FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can update their own comments" ON comments FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete their own comments" ON comments FOR DELETE USING (auth.uid() = user_id); 
+CREATE POLICY "Users can delete their own comments" ON comments FOR DELETE USING (auth.uid() = user_id);
 
--- Create login_sessions table
+-- create login_sessions table to track user logins
 CREATE TABLE login_sessions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -97,7 +97,7 @@ CREATE TABLE login_sessions (
     UNIQUE(user_id, login_date)
 );
 
--- RLS for login_sessions
+-- enable RLS and define policies for login_sessions table
 ALTER TABLE login_sessions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view their own login sessions" ON login_sessions FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert their own login sessions" ON login_sessions FOR INSERT WITH CHECK (auth.uid() = user_id); 
+CREATE POLICY "Users can insert their own login sessions" ON login_sessions FOR INSERT WITH CHECK (auth.uid() = user_id);

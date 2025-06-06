@@ -1,6 +1,8 @@
 {% extends 'base.html' %} {% block title %}Browse Courses | Eldiiar Academy{%
 endblock %} {% block content %}
+<!-- main container for course browsing -->
 <div class="container mx-auto px-4 py-8">
+  <!-- page header with title and admin create button -->
   <div class="flex justify-between items-center mb-8">
     <h1 class="text-3xl font-bold">Browse Courses</h1>
     {% if user and user.is_admin %}
@@ -13,6 +15,7 @@ endblock %} {% block content %}
     {% endif %}
   </div>
 
+  <!-- admin badge display -->
   {% if user and user.is_admin %}
   <div class="mb-4">
     <span
@@ -22,9 +25,11 @@ endblock %} {% block content %}
   </div>
   {% endif %}
 
+  <!-- course cards grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for course in courses %}
     <div class="bg-white rounded-lg shadow-md p-6">
+      <!-- course info and admin delete button -->
       <div class="flex justify-between items-start mb-4">
         <div>
           <h2 class="text-xl font-semibold mb-2">{{ course.title }}</h2>
@@ -39,10 +44,12 @@ endblock %} {% block content %}
         </button>
         {% endif %}
       </div>
+      <!-- course stats -->
       <div class="flex items-center text-sm text-gray-500">
         <span class="mr-4">Units: {{ course.units_count }}</span>
         <span>Lessons: {{ course.lessons_count }}</span>
       </div>
+      <!-- view course link -->
       <a
         href="/course/{{ course.id }}"
         class="mt-4 inline-block text-blue-600 hover:text-blue-800"
@@ -52,6 +59,7 @@ endblock %} {% block content %}
     {% endfor %}
   </div>
 
+  <!-- empty state message -->
   {% if not courses %}
   <div class="text-center text-gray-500 mt-8">
     <p>No courses available yet.</p>
@@ -59,8 +67,10 @@ endblock %} {% block content %}
     <p class="mt-2">Click "Create New Course" to add your first course!</p>
     {% endif %}
   </div>
-  {% endif %} {% if user and user.is_admin %}
-  <!-- Create Course Modal -->
+  {% endif %}
+
+  <!-- create course modal for admins -->
+  {% if user and user.is_admin %}
   <div
     id="createCourseModal"
     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden"
@@ -68,6 +78,7 @@ endblock %} {% block content %}
     <div class="bg-white rounded-lg p-8 w-full max-w-md">
       <h2 class="text-2xl font-bold mb-4">Create New Course</h2>
       <form id="createCourseForm">
+        <!-- course title input -->
         <div class="mb-4">
           <label class="block text-gray-700 mb-2">Title</label>
           <input
@@ -77,7 +88,8 @@ endblock %} {% block content %}
             required
           />
         </div>
-        <div class="mb-4"> 
+        <!-- course description input -->
+        <div class="mb-4">
           <label class="block text-gray-700 mb-2">Description</label>
           <textarea
             name="description"
@@ -85,6 +97,7 @@ endblock %} {% block content %}
             rows="4"
           ></textarea>
         </div>
+        <!-- form action buttons -->
         <div class="flex justify-end">
           <button
             type="button"
@@ -100,6 +113,7 @@ endblock %} {% block content %}
             Create
           </button>
         </div>
+        <!-- error message placeholder -->
         <div id="createCourseError" class="text-red-600 mt-2 hidden"></div>
       </form>
     </div>
@@ -107,18 +121,22 @@ endblock %} {% block content %}
   {% endif %}
 </div>
 
+<!-- admin javascript for course management -->
 {% if user and user.is_admin %}
 <script>
+  // show create course modal
   function showCreateCourseModal() {
     document.getElementById("createCourseModal").classList.remove("hidden");
   }
 
+  // hide create course modal and reset form
   function hideCreateCourseModal() {
     document.getElementById("createCourseModal").classList.add("hidden");
     document.getElementById("createCourseError").classList.add("hidden");
     document.getElementById("createCourseForm").reset();
   }
 
+  // delete course with confirmation
   async function deleteCourse(courseId) {
     if (
       !confirm(
@@ -144,6 +162,7 @@ endblock %} {% block content %}
     }
   }
 
+  // handle course creation form submission
   document
     .getElementById("createCourseForm")
     .addEventListener("submit", async (e) => {

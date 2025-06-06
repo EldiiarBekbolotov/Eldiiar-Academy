@@ -1,13 +1,17 @@
 {% extends "base.html" %} {% block title %}Community Guidelines - Eldiiar
 Academy{% endblock %} {% block content %}
+<!-- main container for community guidelines -->
 <div class="max-w-4xl mx-auto py-8">
+  <!-- page title -->
   <h1 class="text-3xl font-bold text-gray-900 mb-8">Community Guidelines</h1>
 
   <div class="prose prose-lg">
+    <!-- last updated date -->
     <p class="text-gray-800 mb-6">
       Last updated: {{ now.strftime('%B %d, %Y') }}
     </p>
 
+    <!-- academic integrity section -->
     <section class="mb-8">
       <h2 class="text-2xl font-semibold text-gray-900 mb-4">
         1. Academic Integrity
@@ -22,6 +26,7 @@ Academy{% endblock %} {% block content %}
       </ul>
     </section>
 
+    <!-- discussion guidelines section -->
     <section class="mb-8">
       <h2 class="text-2xl font-semibold text-gray-900 mb-4">
         2. Discussion Guidelines
@@ -37,6 +42,7 @@ Academy{% endblock %} {% block content %}
       </ul>
     </section>
 
+    <!-- content standards section -->
     <section class="mb-8">
       <h2 class="text-2xl font-semibold text-gray-900 mb-4">
         3. Content Standards
@@ -50,6 +56,7 @@ Academy{% endblock %} {% block content %}
       </ul>
     </section>
 
+    <!-- consequences section -->
     <section class="mb-8">
       <h2 class="text-2xl font-semibold text-gray-900 mb-4">4. Consequences</h2>
       <p class="text-gray-800 mb-4">
@@ -62,6 +69,7 @@ Academy{% endblock %} {% block content %}
       </ul>
     </section>
 
+    <!-- commented out contact section -->
     <!--<section class="mb-8">
       <h2 class="text-2xl font-semibold text-gray-900 mb-4">7. Contact Us</h2>
       <p class="text-gray-800 mb-4">
