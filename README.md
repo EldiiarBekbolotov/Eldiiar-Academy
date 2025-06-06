@@ -15,3 +15,4 @@ Provides an interactive learning experience with courses, lessons, and comments.
   - Render
 
 Visit LICENSE.md for license information.
+Visit GETTINGSTARTED.md if you are a contributor
