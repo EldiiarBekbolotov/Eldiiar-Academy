@@ -22,11 +22,17 @@ FLASK_SECRET_KEY=your_secret_key
 ```
 
 Finally, run the program:
+
 `flask run`
+
 if you want auto reloading on code changes, use:
+
 `flask --app app.py --debug run`
+
 or
+
 `python app.py` (I recommend this as it is a live server - update your code, save, reload, and voila)
+
 
 # Other useful commands:
 
