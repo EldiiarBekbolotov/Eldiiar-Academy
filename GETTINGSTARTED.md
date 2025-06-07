@@ -1,5 +1,6 @@
 _How to run the program using the terminal:_
 
+Create your virtual environment, activate it, and install all the Python libraries:
 <pre><code>
 bash python -m venv/venv # if this doesn't work, python -m venv/venv
 source venv/bin/activate
@@ -25,4 +26,8 @@ Finally, run the program:
 if you want auto reloading on code changes, use:
 `flask --app app.py --debug run`
 or
-`python app.py`
+`python app.py` (I recommend this as it is a live server - update your code, save, reload, and voila)
+
+# Other useful commands:
+
+`pip freeze > requirements.txt`: Automatically updates the requirements.txt file with everything in your virtual environment
