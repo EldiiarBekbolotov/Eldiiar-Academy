@@ -1,5 +1,7 @@
 _How to run the program using the terminal:_
 
+Note: If you don't know how to open the terminal inside your editor, pressing CONTROL+` (backtick) will usually do the trick.
+
 Create your virtual environment, activate it, and install all the Python libraries:
 <pre><code>
 bash python -m venv/venv # if this doesn't work, python -m venv/venv
@@ -37,3 +39,19 @@ or
 # Other useful commands:
 
 `pip freeze > requirements.txt`: Automatically updates the requirements.txt file with everything in your virtual environment
+
+## Push to GitHub crashcourse
+Stage commits, add commit message, and push to main branch (all through terminal).
+```
+git add .
+
+git commit -m 'Brief description of what you changed'
+
+git push origin main 
+```
+
+The last line is for pushing to your main branch, if you already have a tracking branch set up simply put: 
+```git push```
+
+This is not recommended, but if you are seeing continuous error messages and want to force push your code into GitHub, you can use:
+```git push --force```
